@@ -5,12 +5,17 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-// URL Google Apps Script Web App Default Resmi SPPG Cileungsi 30
-let DEFAULT_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwNGWey3fWQyMDRckUBnjqLwZPHu-q6tN39J-ZsojFdPywMpDIDkUiuHqejfGeoUf-G9Q/exec";
+// URL Google Apps Script Web App Default Resmi SPPG Cileungsi 30 (Versi Baru dengan Data_Karyawan & PIN)
+let DEFAULT_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzFFFJf0yn6h5S9B8XYqXo59hL19ooscQ9gQFWQLDa8LWfPCn2YBqu0xDRzDj4uKqOEdQ/exec";
 
 // Ambil URL Webhook aktif dari localStorage atau fallback default
 function getSheetsWebhookUrl() {
   const localUrl = localStorage.getItem('sppg_sheets_webhook_url');
+  // Jika localUrl masih menunjuk ke script lama, auto-upgrade ke versi terbaru
+  if (localUrl && localUrl.includes('AKfycbwNGWey3fWQyMDRckUBnjqLwZPHu-q6tN39J-ZsojFdPywMpDIDkUiuHqejfGeoUf-G9Q')) {
+    localStorage.setItem('sppg_sheets_webhook_url', DEFAULT_SHEETS_WEBHOOK_URL);
+    return DEFAULT_SHEETS_WEBHOOK_URL;
+  }
   if (localUrl && localUrl.trim()) return localUrl.trim();
   return DEFAULT_SHEETS_WEBHOOK_URL;
 }
