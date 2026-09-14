@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Eksekutif Pimpinan &amp; Owner — SPPG Cileungsi 30</title>
+  
+  <!-- Meta SEO -->
+  <meta name="description" content="Dashboard Eksekutif Monitoring Mutaba'ah KPI Ibadah dan 8 Adab Kerja Harian Karyawan SPPG Cileungsi 30.">
+  <meta name="theme-color" content="#064E3B">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Amiri -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css?v=20260914">
+  <link rel="stylesheet" href="css/dashboard.css?v=20260914">
+
+  <!-- SheetJS Library for Client-side Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body class="dashboard-body">
+
+  <!-- ── 1. PIN LOGIN SCREEN (JIKA BELUM TEROTENTIKASI) ── -->
+  <div id="dashPinLoginScreen" class="pin-login-card-wrapper" style="display:none">
+    <div class="pin-login-box">
+      <div style="font-size:42px;margin-bottom:8px">👑</div>
+      <div class="dash-brand-badge" style="display:inline-block;margin-bottom:8px;background:#ECFDF5;color:#064E3B;border:1px solid #A7F3D0">
+        SPPG Cileungsi 30
+      </div>
+      <h2 style="font-size:22px;font-weight:800;color:#0F172A;margin-bottom:6px">Portal Pimpinan &amp; Owner</h2>
+      <p style="font-size:13px;color:#64748B;margin-bottom:24px">
+        Masukkan PIN Pengaman untuk mengakses analitik kepatuhan ibadah, adab kerja, dan ekspor laporan.
+      </p>
+
+      <div style="display:grid;gap:14px;text-align:left">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">PIN Rahasia:</label>
+          <input type="password" id="dashLoginPinInput" maxlength="8" placeholder="••••" class="input-filter" style="width:100%;font-size:24px;text-align:center;letter-spacing:0.4em" onkeydown="if(event.key==='Enter') submitDashboardPin()">
+          <span style="font-size:11px;color:#94A3B8;display:block;margin-top:4px;text-align:center">PIN default: 8899 atau 2026</span>
+        </div>
+
+        <button type="button" onclick="submitDashboardPin()" class="btn-submit-mutabaah" style="margin-top:8px">
+          <span>Masuk ke Portal Eksekutif 🔑</span>
+        </button>
+
+        <div style="text-align:center;margin-top:12px">
+          <a href="index.html" style="font-size:12.5px;color:#0D9488;text-decoration:none;font-weight:700">
+            ← Kembali ke Formulir Karyawan
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. DASHBOARD UTAMA (JIKA PIN LOLOS) ── -->
+  <div id="dashMainScreen" style="display:none">
+    
+    <!-- Topbar -->
+    <header class="dash-topbar">
+      <div class="dash-topbar-inner">
+        <div>
+          <div class="dash-brand-title">
+            <span>🥗 SPPG Cileungsi 30</span>
+            <span class="dash-brand-badge">Portal Pimpinan</span>
+          </div>
+          <div style="font-size:12px;color:#D1FAE5">Satuan Pelayanan Pemenuhan Gizi • Monitoring Ibadah &amp; Adab Kerja</div>
+        </div>
+
+        <div class="dash-topbar-actions">
+          <a href="index.html" class="btn-topbar-action" target="_blank">
+            <span>📱 Form Karyawan ↗</span>
+          </a>
+          <button type="button" class="btn-topbar-action" onclick="openRosterModal()">
+            <span>👥 Master Karyawan</span>
+          </button>
+          <button type="button" class="btn-topbar-action btn-topbar-gold" onclick="openSettingsModal()">
+            <span>⚙️ Spreadsheet &amp; PIN</span>
+          </button>
+          <button type="button" class="btn-topbar-action" onclick="logoutDashboard()" style="background:rgba(239,68,68,0.25);border-color:#FCA5A5">
+            <span>🔒 Keluar</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="dash-container">
+      
+      <!-- Ringkasan Statistik Eksekutif -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <span>Partisipasi Karyawan</span>
+            <span>👥</span>
+          </div>
+          <div class="stat-card-value" id="statPartisipasiVal">0 / 0</div>
+          <div class="stat-card-desc" id="statPartisipasiDesc">0% Karyawan Mengisi</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <span>Rata-rata Skor KPI</span>
+            <span>🌟</span>
+          </div>
+          <div class="stat-card-value" id="statAvgScoreVal">0%</div>
+          <div class="stat-card-desc">Indeks Kepatuhan Total</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <span>Shalat di Masjid</span>
+            <span>🕌</span>
+          </div>
+          <div class="stat-card-value" id="statMasjidRateVal">0%</div>
+          <div class="stat-card-desc">Kepatuhan Berjamaah Masjid</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-label">
+            <span>Adab Kerja Dapur</span>
+            <span>🤝</span>
+          </div>
+          <div class="stat-card-value" id="statAdabRateVal">0%</div>
+          <div class="stat-card-desc">8 Kriteria Adab Terpenuhi</div>
+        </div>
+      </section>
+
+      <!-- Grid 2 Kolom: Leaderboard & Divisi Breakdown -->
+      <section class="dash-two-cols">
+        
+        <!-- Leaderboard Keistiqomahan -->
+        <div class="dash-box">
+          <div class="dash-box-header">
+            <div class="dash-box-title">
+              <span>🏆 Karyawan Paling Istiqomah</span>
+            </div>
+            <span style="font-size:12px;color:#64748B">Apresiasi &amp; Keteladanan</span>
+          </div>
+          <div id="leaderboardListContainer" class="leaderboard-list">
+            <!-- Render via JS -->
+          </div>
+        </div>
+
+        <!-- Analisis per Divisi -->
+        <div class="dash-box">
+          <div class="dash-box-header">
+            <div class="dash-box-title">
+              <span>📊 Kepatuhan per Divisi</span>
+            </div>
+          </div>
+          <div id="divisiBreakdownContainer">
+            <!-- Render via JS -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Filter Toolbar & Ekspor -->
+      <section class="filter-toolbar">
+        <div class="filter-group">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px">Tanggal:</label>
+            <input type="date" id="filterTanggal" class="input-filter">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px">Divisi SPPG:</label>
+            <select id="filterDivisi" class="input-filter"></select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:#64748B;display:block;margin-bottom:3px">Pencarian:</label>
+            <input type="text" id="filterSearch" placeholder="Cari NIK atau Nama..." class="input-filter" style="width:190px">
+          </div>
+          <div style="align-self:flex-end">
+            <button type="button" onclick="resetFilters()" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+              Reset ↺
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn-export btn-export-excel" onclick="exportToExcel()">
+            <span>📥 Download Excel (.xlsx)</span>
+          </button>
+          <button type="button" class="btn-export" onclick="exportToCSV()" style="background:#0284C7">
+            <span>📄 CSV</span>
+          </button>
+          <button type="button" class="btn-export" onclick="window.print()" style="background:#475569">
+            <span>🖨️ Cetak Laporan</span>
+          </button>
+          <button type="button" class="btn-export" id="btnRefreshData" onclick="loadDashboardData(true)" style="background:#D97706">
+            <span>🔄 Refresh Data</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Tabel Detail Submisi -->
+      <section>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h3 style="font-size:16px;font-weight:800;color:#0F172A">📑 Data Rekapitulasi Mutaba'ah Harian</h3>
+          <span id="tableRowCountDisplay" style="font-size:12px;color:#64748B">Menampilkan 0 rekaman</span>
+        </div>
+
+        <div class="table-responsive-wrapper">
+          <table class="data-table-styled">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>NIK</th>
+                <th>Nama Karyawan</th>
+                <th>Divisi</th>
+                <th>Skor</th>
+                <th>Shalat 5 Waktu</th>
+                <th>Dzikir P/S</th>
+                <th>Adab Kerja</th>
+                <th>Waktu Kirim</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="submissionsTableBody">
+              <!-- Render via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+  </div> <!-- End #dashMainScreen -->
+
+  <!-- ── MODAL DETAIL ROW ── -->
+  <div class="modal-overlay" id="detailRowModal">
+    <div class="modal-card" style="max-width:580px">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🔍 Rincian Mutaba'ah Karyawan</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeDetailRowModal()">✕</button>
+      </div>
+      <div id="detailRowModalBody">
+        <!-- Render via JS -->
+      </div>
+      <div style="margin-top:20px;text-align:right">
+        <button type="button" class="btn-submit-mutabaah" onclick="closeDetailRowModal()" style="padding:10px 20px;font-size:13px;display:inline-flex;width:auto">
+          <span>Tutup Rincian ✓</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL SETTINGS (SPREADSHEET & PIN) ── -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-card" style="max-width:560px">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>⚙️ Pengaturan Spreadsheet &amp; Keamanan</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeSettingsModal()">✕</button>
+      </div>
+      <div style="display:grid;gap:16px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">
+            📊 URL Webhook Google Apps Script (Spreadsheet):
+          </label>
+          <input type="url" id="settingWebhookUrl" placeholder="https://script.google.com/macros/s/.../exec" class="input-filter" style="width:100%;font-size:12px">
+          <div style="font-size:11.5px;color:#64748B;margin-top:4px;line-height:1.4">
+            Dapatkan URL ini dari: <strong>Google Spreadsheet &gt; Ekstensi &gt; Apps Script &gt; Terapkan sebagai Aplikasi Web (Web App)</strong>. Kode Apps Script sudah disediakan lengkap di file <code>google-apps-script.js</code>.
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">
+            🔒 Ubah PIN Pimpinan / Owner:
+          </label>
+          <input type="text" id="settingNewPin" maxlength="8" placeholder="Contoh: 8899" class="input-filter" style="width:160px;font-size:15px;letter-spacing:0.1em">
+          <span style="font-size:11px;color:#94A3B8;display:block;margin-top:4px">PIN untuk membuka portal dashboard ini.</span>
+        </div>
+
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px;font-size:12px;color:#475569">
+          <strong>ℹ️ Catatan Sistem:</strong><br>
+          Jika URL Google Apps Script belum diisi, aplikasi tetap beroperasi secara <strong>Offline-First</strong> (data tersimpan di perangkat lokal masing-masing dan dapat diekspor langsung ke Excel kapan saja).
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px">
+          <button type="button" onclick="closeSettingsModal()" style="background:#F1F5F9;border:1px solid #CBD5E1;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+            Batal
+          </button>
+          <button type="button" onclick="saveSettings()" class="btn-submit-mutabaah" style="padding:10px 20px;font-size:13px;width:auto">
+            <span>Simpan Pengaturan ✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL MASTER DATA KARYAWAN ── -->
+  <div class="modal-overlay" id="rosterModal">
+    <div class="modal-card" style="max-width:760px">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>👥 Kelola Master Data Karyawan SPPG Cileungsi 30</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeRosterModal()">✕</button>
+      </div>
+
+      <!-- Tambah Karyawan Baru -->
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:16px;margin-bottom:18px">
+        <strong style="font-size:13px;color:#064E3B;display:block;margin-bottom:10px">+ Tambah Karyawan Baru:</strong>
+        <div style="display:grid;grid-template-columns:1fr 2fr 2fr 1fr;gap:10px">
+          <input type="text" id="newRosterNik" placeholder="NIK (misal: SPPG-029)" class="input-filter" style="text-transform:uppercase">
+          <input type="text" id="newRosterNama" placeholder="Nama Lengkap Karyawan" class="input-filter">
+          <select id="newRosterDivisi" class="input-filter">
+            <option value="Unit Gizi & Quality Control">Unit Gizi &amp; QC</option>
+            <option value="Juru Masak (Dapur Utama)" selected>Juru Masak (Dapur Utama)</option>
+            <option value="Persiapan Bahan (Prep Cook)">Persiapan Bahan (Prep Cook)</option>
+            <option value="Pengemasan & Pemorsian (Packing)">Pengemasan &amp; Pemorsian</option>
+            <option value="Distribusi & Pengiriman (Logistik)">Distribusi &amp; Logistik</option>
+            <option value="Sanitasi, Pencucian & Kebersihan">Sanitasi &amp; Kebersihan</option>
+            <option value="Administrasi & Pengadaan Gudang">Administrasi &amp; Gudang</option>
+          </select>
+          <input type="text" id="newRosterRole" placeholder="Jabatan / Peran" class="input-filter">
+        </div>
+        <div style="text-align:right;margin-top:10px">
+          <button type="button" onclick="addRosterItem()" class="btn-submit-mutabaah" style="padding:8px 16px;font-size:12.5px;width:auto;display:inline-flex">
+            <span>+ Daftarkan Karyawan</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabel Daftar Karyawan -->
+      <div class="table-responsive-wrapper" style="max-height:380px;overflow-y:auto">
+        <table class="data-table-styled">
+          <thead>
+            <tr>
+              <th style="width:40px">No</th>
+              <th>NIK</th>
+              <th>Nama Lengkap</th>
+              <th>Divisi</th>
+              <th>Jabatan / Role</th>
+              <th style="width:60px">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="rosterTableBody">
+            <!-- Render via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:16px;text-align:right">
+        <button type="button" onclick="closeRosterModal()" class="btn-submit-mutabaah" style="padding:10px 20px;font-size:13px;width:auto;display:inline-flex">
+          <span>Telesai &amp; Tutup ✓</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/roster-karyawan.js?v=20260914"></script>
+  <script src="js/cloud-sync.js?v=20260914"></script>
+  <script src="js/dashboard.js?v=20260914"></script>
+</body>
+</html>

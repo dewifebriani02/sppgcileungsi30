@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KPI Ibadah & Adab Kerja — SPPG Cileungsi 30</title>
+  
+  <!-- Meta SEO & PWA -->
+  <meta name="description" content="Aplikasi Pencatatan Mutaba'ah KPI Ibadah dan Adab Kerja Harian Karyawan Satuan Pelayanan Pemenuhan Gizi (SPPG) Cileungsi 30.">
+  <meta name="theme-color" content="#064E3B">
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Amiri -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css?v=20260914">
+</head>
+<body>
+
+  <!-- Confetti Celebration Canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="app-container">
+
+    <!-- ── 1. HEADER ── -->
+    <header class="app-header">
+      <div class="header-top">
+        <div>
+          <div class="brand-badge">🥗 SPPG Cileungsi 30 • Dapur Berkah</div>
+          <h1 class="brand-title">KPI Ibadah &amp; Adab</h1>
+          <p class="brand-subtitle">Satuan Pelayanan Pemenuhan Gizi</p>
+        </div>
+        <button type="button" class="btn-owner-portal-shortcut" id="btnOwnerPortalTop" onclick="openOwnerPinModal()">
+          <span>👑 Pimpinan</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── 2. USER IDENTITY STRIP ── -->
+    <div class="user-identity-strip">
+      <div class="user-meta-info">
+        <div class="user-avatar-circle" id="userAvatarInitial">SP</div>
+        <div>
+          <div class="user-name-text" id="userNameDisplay">Memuat Karyawan...</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+            <span class="user-divisi-badge" id="userDivisiDisplay">SPPG Cileungsi 30</span>
+            <span style="font-size:11px;color:#64748B;font-weight:700">NIK: <span id="userNikDisplay">-</span></span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-switch-nik" id="btnSwitchNik" onclick="openNikModal(false)">
+        <span>Ganti NIK ↺</span>
+      </button>
+    </div>
+
+    <!-- ── VIEW 1: FORM INPUT MUTABA'AH HARI INI ── -->
+    <main id="viewFormSection">
+      
+      <!-- Date Selector Bar -->
+      <div class="date-selector-bar">
+        <div class="date-label-wrapper">
+          <label for="inputTanggalKpi" style="font-size:12px;font-weight:700;color:#475569">Tanggal:</label>
+          <input type="date" id="inputTanggalKpi" class="date-input-styled">
+        </div>
+        <button type="button" class="btn-today-pill" id="btnSetToday">Hari Ini 📅</button>
+      </div>
+
+      <!-- Score Summary Dial Card -->
+      <div class="score-summary-card">
+        <div>
+          <div class="score-title-sub">Indeks Capaian Hari Ini</div>
+          <div class="score-grade-text" id="scoreGradeText">Mumtaz (Istimewa) 🌟</div>
+          <div class="score-desc-text" id="scoreDescText">Alhamdulillah! Sangat disiplin dan istiqomah.</div>
+        </div>
+        <div class="score-circle-wrapper">
+          <svg class="score-circle-svg" viewBox="0 0 70 70">
+            <circle class="score-circle-bg" cx="35" cy="35" r="30"></circle>
+            <circle class="score-circle-progress" id="scoreCircleSvgProgress" cx="35" cy="35" r="30"></circle>
+          </svg>
+          <div class="score-circle-value" id="scorePercentageValue">100%</div>
+        </div>
+      </div>
+
+      <!-- Form Content Areas -->
+      <div class="form-content-area">
+
+        <!-- SECTION 1: SHALAT FARDHU 5 WAKTU -->
+        <section class="section-box">
+          <div class="section-header">
+            <div class="section-title-group">
+              <div class="section-icon-badge">🕌</div>
+              <div>
+                <h2 class="section-title">Shalat Fardhu 5 Waktu</h2>
+                <p class="section-subtitle">Pilih pelaksanaan shalat fardhu Anda</p>
+              </div>
+            </div>
+            <span class="section-badge">Bobot 40%</span>
+          </div>
+
+          <div class="shalat-list">
+            
+            <!-- Subuh -->
+            <div class="shalat-row-card">
+              <div class="shalat-row-top">
+                <span class="shalat-name">🌅 Subuh</span>
+                <span class="shalat-status-indicator">Pilih Status:</span>
+              </div>
+              <div class="segmented-shalat-group" data-waktu="subuh">
+                <div class="segment-btn active-masjid" data-val="masjid">
+                  <span>Masjid</span>
+                  <span class="sub">+100</span>
+                </div>
+                <div class="segment-btn" data-val="jamaah">
+                  <span>Jamaah</span>
+                  <span class="sub">+85</span>
+                </div>
+                <div class="segment-btn" data-val="munfarid">
+                  <span>Sendiri</span>
+                  <span class="sub">+65</span>
+                </div>
+                <div class="segment-btn" data-val="udzur">
+                  <span>Udzur</span>
+                  <span class="sub">Haid/Sakit</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dzuhur -->
+            <div class="shalat-row-card">
+              <div class="shalat-row-top">
+                <span class="shalat-name">☀️ Dzuhur</span>
+                <span class="shalat-status-indicator">Pilih Status:</span>
+              </div>
+              <div class="segmented-shalat-group" data-waktu="dzuhur">
+                <div class="segment-btn active-masjid" data-val="masjid">
+                  <span>Masjid</span>
+                  <span class="sub">+100</span>
+                </div>
+                <div class="segment-btn" data-val="jamaah">
+                  <span>Jamaah</span>
+                  <span class="sub">+85</span>
+                </div>
+                <div class="segment-btn" data-val="munfarid">
+                  <span>Sendiri</span>
+                  <span class="sub">+65</span>
+                </div>
+                <div class="segment-btn" data-val="udzur">
+                  <span>Udzur</span>
+                  <span class="sub">Haid/Sakit</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ashar -->
+            <div class="shalat-row-card">
+              <div class="shalat-row-top">
+                <span class="shalat-name">🌤️ Ashar</span>
+                <span class="shalat-status-indicator">Pilih Status:</span>
+              </div>
+              <div class="segmented-shalat-group" data-waktu="ashar">
+                <div class="segment-btn active-masjid" data-val="masjid">
+                  <span>Masjid</span>
+                  <span class="sub">+100</span>
+                </div>
+                <div class="segment-btn" data-val="jamaah">
+                  <span>Jamaah</span>
+                  <span class="sub">+85</span>
+                </div>
+                <div class="segment-btn" data-val="munfarid">
+                  <span>Sendiri</span>
+                  <span class="sub">+65</span>
+                </div>
+                <div class="segment-btn" data-val="udzur">
+                  <span>Udzur</span>
+                  <span class="sub">Haid/Sakit</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Maghrib -->
+            <div class="shalat-row-card">
+              <div class="shalat-row-top">
+                <span class="shalat-name">🌇 Maghrib</span>
+                <span class="shalat-status-indicator">Pilih Status:</span>
+              </div>
+              <div class="segmented-shalat-group" data-waktu="maghrib">
+                <div class="segment-btn active-masjid" data-val="masjid">
+                  <span>Masjid</span>
+                  <span class="sub">+100</span>
+                </div>
+                <div class="segment-btn" data-val="jamaah">
+                  <span>Jamaah</span>
+                  <span class="sub">+85</span>
+                </div>
+                <div class="segment-btn" data-val="munfarid">
+                  <span>Sendiri</span>
+                  <span class="sub">+65</span>
+                </div>
+                <div class="segment-btn" data-val="udzur">
+                  <span>Udzur</span>
+                  <span class="sub">Haid/Sakit</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Isya -->
+            <div class="shalat-row-card">
+              <div class="shalat-row-top">
+                <span class="shalat-name">🌙 Isya</span>
+                <span class="shalat-status-indicator">Pilih Status:</span>
+              </div>
+              <div class="segmented-shalat-group" data-waktu="isya">
+                <div class="segment-btn active-masjid" data-val="masjid">
+                  <span>Masjid</span>
+                  <span class="sub">+100</span>
+                </div>
+                <div class="segment-btn" data-val="jamaah">
+                  <span>Jamaah</span>
+                  <span class="sub">+85</span>
+                </div>
+                <div class="segment-btn" data-val="munfarid">
+                  <span>Sendiri</span>
+                  <span class="sub">+65</span>
+                </div>
+                <div class="segment-btn" data-val="udzur">
+                  <span>Udzur</span>
+                  <span class="sub">Haid/Sakit</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- SECTION 2: SHALAT SUNNAH -->
+        <section class="section-box">
+          <div class="section-header">
+            <div class="section-title-group">
+              <div class="section-icon-badge">✨</div>
+              <div>
+                <h2 class="section-title">Shalat Sunnah</h2>
+                <p class="section-subtitle">Penyempurna amalan wajib harian</p>
+              </div>
+            </div>
+            <span class="section-badge">Sunnah Muakkadah</span>
+          </div>
+
+          <div class="checklist-group">
+            <div class="check-item-card sunnah-check-card" data-field="rawatib">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">Shalat Sunnah Rawatib</div>
+                <div class="check-item-desc">Qobliyah &amp; Ba'diyah (Dzuhur, Ashar, Maghrib, Isya, Subuh)</div>
+              </div>
+              <span class="check-item-points">+5</span>
+            </div>
+
+            <div class="check-item-card sunnah-check-card" data-field="dhuha">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">Shalat Dhuha</div>
+                <div class="check-item-desc">Minimal 2 rakaat di waktu pagi sebelum jam sibuk dapur</div>
+              </div>
+              <span class="check-item-points">+5</span>
+            </div>
+
+            <div class="check-item-card sunnah-check-card" data-field="tahajud">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">Tahajud / Qiyamul Lail &amp; Witir</div>
+                <div class="check-item-desc">Ibadah malam hari mengetuk pintu rahmat dan keberkahan</div>
+              </div>
+              <span class="check-item-points">+6</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: TILAWAH & DZIKIR SUNNAH -->
+        <section class="section-box">
+          <div class="section-header">
+            <div class="section-title-group">
+              <div class="section-icon-badge">📖</div>
+              <div>
+                <h2 class="section-title">Tilawah, Dzikir &amp; Sedekah</h2>
+                <p class="section-subtitle">Dzikir pagi sore sesuai sunnah &amp; sedekah</p>
+              </div>
+            </div>
+            <span class="section-badge">Ruhaniyah</span>
+          </div>
+
+          <!-- Tilawah & Puasa Row -->
+          <div class="input-row-grid" style="margin-bottom:14px">
+            <div class="input-field-block">
+              <label class="input-field-label">📖 Tilawah Quran:</label>
+              <div class="input-stepper-box">
+                <button type="button" class="btn-stepper" id="btnTilawahMinus">−</button>
+                <input type="number" id="tilawahValue" class="input-stepper-value" value="1" min="0">
+                <button type="button" class="btn-stepper" id="btnTilawahPlus">+</button>
+              </div>
+              <span class="input-field-desc">Lembar / Halaman</span>
+            </div>
+
+            <div class="input-field-block">
+              <label class="input-field-label">🌙 Ibadah Puasa:</label>
+              <select id="selectPuasa" class="select-styled">
+                <option value="Tidak Puasa">Tidak Puasa</option>
+                <option value="Sunnah Senin-Kamis">Puasa Senin-Kamis</option>
+                <option value="Puasa Daud">Puasa Daud</option>
+                <option value="Ayyamul Bidh">Ayyamul Bidh</option>
+                <option value="Puasa Wajib">Puasa Wajib (Ramadhan/Qadha)</option>
+              </select>
+              <span class="input-field-desc">Kondisi harian</span>
+            </div>
+          </div>
+
+          <div class="checklist-group">
+            <!-- Dzikir Pagi -->
+            <div class="check-item-card dzikir-check-card" data-field="pagi">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">📿 Dzikir Pagi (Sesuai Sunnah)</div>
+                <div class="check-item-desc">Dibaca ba'da Subuh hingga terbit fajar/dhuha</div>
+              </div>
+              <span class="check-item-points">+3</span>
+            </div>
+
+            <!-- Dzikir Sore -->
+            <div class="check-item-card dzikir-check-card" data-field="sore">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">📿 Dzikir Sore (Sesuai Sunnah)</div>
+                <div class="check-item-desc">Dibaca ba'da Ashar hingga menjelang Maghrib</div>
+              </div>
+              <span class="check-item-points">+3</span>
+            </div>
+
+            <!-- Istighfar & Shalawat -->
+            <div class="check-item-card dzikir-check-card" data-field="istighfar">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">Istighfar &amp; Shalawat Harian</div>
+                <div class="check-item-desc">Membasahi lisan dengan minimal 100x istighfar/shalawat</div>
+              </div>
+              <span class="check-item-points">+2</span>
+            </div>
+
+            <!-- Infaq Subuh -->
+            <div class="check-item-card" id="checkInfaqSubuh">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">Sedekah Subuh / Infaq Harian</div>
+                <div class="check-item-desc">Menitipkan kebaikan harta untuk membuka pintu rezeki</div>
+              </div>
+              <span class="check-item-points">+2</span>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;text-align:center">
+            <button type="button" onclick="openDzikirModal()" style="background:none;border:none;color:#0D9488;font-size:12px;font-weight:700;cursor:pointer;text-decoration:underline">
+              📖 Klik di sini untuk panduan teks bacaan Dzikir Pagi &amp; Sore (Sesuai Sunnah)
+            </button>
+          </div>
+        </section>
+
+        <!-- SECTION 4: 8 ADAB WAJIB HARIAN DI LINGKUNGAN KERJA SPPG -->
+        <section class="section-box">
+          <div class="section-header">
+            <div class="section-title-group">
+              <div class="section-icon-badge">🤝</div>
+              <div>
+                <h2 class="section-title">8 Adab Wajib di Lingkungan Kerja</h2>
+                <p class="section-subtitle">Kepatuhan adab &amp; etos kerja dapur SPPG Cileungsi 30</p>
+              </div>
+            </div>
+            <span class="section-badge">Bobot 30%</span>
+          </div>
+
+          <div class="checklist-group">
+            
+            <!-- Adab 1: Basmalah & Hamdalah -->
+            <div class="check-item-card adab-check-card is-checked" data-adab="basmalah">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">1. Basmalah &amp; Niat Lillahi Ta'ala</div>
+                <div class="check-item-desc">Memulai pekerjaan dapur/operasional dengan bismillah dan menutup dengan alhamdulillah.</div>
+              </div>
+              <span class="check-item-points">+4</span>
+            </div>
+
+            <!-- Adab 2: Thaharah & Higienitas -->
+            <div class="check-item-card adab-check-card is-checked" data-adab="higienitas">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">2. Thaharah &amp; Higienitas Dapur</div>
+                <div class="check-item-desc">Menjaga wudhu, cuci tangan teratur, memakai apron, penutup kepala &amp; sarung tangan bersih.</div>
+              </div>
+              <span class="check-item-points">+4</span>
+            </div>
+
+            <!-- Adab 3: Menjaga Lisan -->
+            <div class="check-item-card adab-check-card is-checked" data-adab="lisan">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">3. Menjaga Lisan (Bebas Ghibah)</div>
+                <div class="check-item-desc">Tidak membicarakan aib rekan, tidak mengumpat/berkata kasar, dan tidak berkeluh kesah.</div>
+              </div>
+              <span class="check-item-points">+4</span>
+            </div>
+
+            <!-- Adab 4: 5S Salam -->
+            <div class="check-item-card adab-check-card is-checked" data-adab="salam">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">4. Budaya 5S &amp; Tebar Salam</div>
+                <div class="check-item-desc">Senyum, Salam, Sapa, Sopan, Santun saat bertemu rekan kerja, pimpinan, maupun tamu.</div>
+              </div>
+              <span class="check-item-points">+3</span>
+            </div>
+
+            <!-- Adab 5: Muamalah Lawan Jenis -->
+            <div class="check-item-card adab-check-card is-checked" data-adab="muamalah">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">5. Batasan Sopan dengan Lawan Jenis</div>
+                <div class="check-item-desc">Menjaga pandangan (ghadul bashar), tutur kata profesional, dan tidak bercanda berlebihan.</div>
+              </div>
+              <span class="check-item-points">+4</span>
+            </div>
+
+            <!-- Adab 6: Amanah Waktu -->
+            <div class="check-item-card adab-check-card is-checked" data-adab="waktu">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">6. Amanah Waktu &amp; Kedisiplinan</div>
+                <div class="check-item-desc">Tepat waktu saat mulai shift kerja masak/packing/distribusi, dan tertib saat jam istirahat.</div>
+              </div>
+              <span class="check-item-points">+4</span>
+            </div>
+
+            <!-- Adab 7: Amanah Bahan & Aset -->
+            <div class="check-item-card adab-check-card is-checked" data-adab="aset">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">7. Amanah Bahan Pangan &amp; Aset SPPG</div>
+                <div class="check-item-desc">Jujur takaran porsi makanan, tidak tabdzir (membuang bahan), dan menjaga alat masak dengan baik.</div>
+              </div>
+              <span class="check-item-points">+4</span>
+            </div>
+
+            <!-- Adab 8: Ta'awun Kerja Tim -->
+            <div class="check-item-card adab-check-card is-checked" data-adab="taawun">
+              <div class="custom-checkbox">✓</div>
+              <div class="check-item-content">
+                <div class="check-item-title">8. Tolong-Menolong (Ta'awun)</div>
+                <div class="check-item-desc">Sigap dan ikhlas membantu rekan satu tim saat persiapan bumbu, masak, atau packing padat.</div>
+              </div>
+              <span class="check-item-points">+3</span>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- SECTION 5: CATATAN HARIAN -->
+        <section class="section-box">
+          <div class="section-header">
+            <div class="section-title-group">
+              <div class="section-icon-badge">📝</div>
+              <div>
+                <h2 class="section-title">Catatan Syukur / Evaluasi</h2>
+                <p class="section-subtitle">Tuliskan doa atau hal positif hari ini (opsional)</p>
+              </div>
+            </div>
+          </div>
+          <textarea id="inputCatatanHarian" class="textarea-styled" placeholder="Tuliskan catatan kerja, target pribadi, atau doa harian di sini..."></textarea>
+        </section>
+
+        <!-- SUBMIT BUTTON ACTION -->
+        <div class="submit-action-wrapper">
+          <button type="button" class="btn-submit-mutabaah" id="btnSubmitMutabaah">
+            <span>💾 Simpan Mutaba'ah Hari Ini ✓</span>
+          </button>
+          <div style="text-align:center;font-size:11.5px;color:#64748B;margin-top:8px">
+            Otomatis terhubung ke Google Spreadsheet Database SPPG Cileungsi 30
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ── VIEW 2: RIWAYAT MUTABA'AH SAYA ── -->
+    <section id="viewHistorySection" style="display:none;padding:18px 18px 40px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <h2 style="font-size:18px;font-weight:800;color:#0F172A">📜 Riwayat Mutaba'ah Saya</h2>
+          <p style="font-size:12px;color:#64748B">Catatan kepatuhan ibadah &amp; adab 30 hari terakhir</p>
+        </div>
+      </div>
+      <div id="historyItemsContainer">
+        <!-- Riwayat dimuat lewat JavaScript -->
+      </div>
+    </section>
+
+    <!-- ── BOTTOM NAVIGATION BAR ── -->
+    <nav class="bottom-nav-bar">
+      <button type="button" class="nav-tab-btn active" data-tab="form">
+        <span class="nav-icon">📝</span>
+        <span>Formulir</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="riwayat">
+        <span class="nav-icon">📜</span>
+        <span>Riwayat</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="dzikir-sunnah">
+        <span class="nav-icon">📿</span>
+        <span>Dzikir</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-tab="portal-pimpinan">
+        <span class="nav-icon">👑</span>
+        <span>Pimpinan</span>
+      </button>
+    </nav>
+
+  </div> <!-- End .app-container -->
+
+  <!-- ── MODAL 1: SETUP NIK KARYAWAN ── -->
+  <div class="modal-overlay" id="nikSetupModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🏷️ Identitas Karyawan SPPG</span>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnCloseNikModal" onclick="closeNikModal()">✕</button>
+      </div>
+      <p style="font-size:13px;color:#64748B;margin-bottom:16px">
+        Masukkan Nomor Induk Karyawan (NIK) Anda. Sistem akan mengingat identitas di ponsel Anda tanpa perlu login berulang.
+      </p>
+      <div style="display:grid;gap:14px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">Nomor Induk Karyawan (NIK):</label>
+          <input type="text" id="modalNikInput" placeholder="Contoh: SPPG-004 atau 4" class="date-input-styled" style="width:100%;font-size:15px;text-transform:uppercase" autofocus>
+          <div id="modalLookupStatus" style="margin-top:6px;font-size:12px"></div>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">Nama Lengkap Karyawan:</label>
+          <input type="text" id="modalNamaInput" placeholder="Nama lengkap Anda..." class="date-input-styled" style="width:100%;font-size:14px">
+        </div>
+
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">Divisi / Bagian SPPG Cileungsi 30:</label>
+          <select id="modalDivisiSelect" class="select-styled" style="font-size:13.5px"></select>
+        </div>
+
+        <button type="button" id="btnSaveNikModal" class="btn-submit-mutabaah" style="margin-top:8px">
+          <span>Mulai Catat Ibadah →</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL 2: PIN GATE OWNER / PIMPINAN ── -->
+  <div class="modal-overlay" id="ownerPinModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>👑 Akses Portal Pimpinan &amp; Owner</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeOwnerPinModal()">✕</button>
+      </div>
+      <p style="font-size:13px;color:#64748B;margin-bottom:16px">
+        Masukkan PIN Keamanan Owner / Pimpinan untuk mengakses rekapitulasi KPI dan ekspor laporan Excel.
+      </p>
+      <div style="display:grid;gap:14px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">PIN Rahasia Pimpinan:</label>
+          <input type="password" id="inputOwnerPin" maxlength="8" placeholder="Masukkan 4-6 digit PIN..." class="date-input-styled" style="width:100%;font-size:18px;text-align:center;letter-spacing:0.3em" onkeydown="if(event.key==='Enter') verifyOwnerPin()">
+          <span style="font-size:11px;color:#94A3B8;display:block;margin-top:4px">PIN default awal: 8899 atau 2026</span>
+        </div>
+        <button type="button" onclick="verifyOwnerPin()" class="btn-submit-mutabaah" style="background:linear-gradient(135deg,#D97706,#B45309)">
+          <span>Buka Dashboard Pimpinan 🔑</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL 3: PANDUAN DZIKIR PAGI & SORE (SESUAI SUNNAH) ── -->
+  <div class="modal-overlay" id="dzikirSunnahModal">
+    <div class="modal-card" style="max-width:540px">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>📿 Dzikir Pagi &amp; Sore (Sesuai Sunnah)</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeDzikirModal()">✕</button>
+      </div>
+      <div style="font-size:13px;color:#334155;line-height:1.6;display:grid;gap:14px">
+        <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:12px">
+          <strong style="color:#064E3B;display:block;margin-bottom:4px">📖 Adab Dzikir:</strong>
+          Bacalah dengan penuh penghayatan, thuma'ninah, dan lisan yang basah dengan dzikir kepada Allah Ta'ala.
+        </div>
+
+        <!-- Ayat Kursi -->
+        <div style="border-bottom:1px solid #E2E8F0;padding-bottom:10px">
+          <div style="font-weight:800;color:#064E3B">1. Membaca Ayat Kursi (1x)</div>
+          <p style="font-family:'Amiri',serif;font-size:18px;line-height:1.8;direction:rtl;text-align:right;color:#0F172A;margin:6px 0">
+            اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ...
+          </p>
+          <div style="font-size:11.5px;color:#64748B">Keutamaan: Siapa yang membacanya di pagi hari akan dilindungi dari godaan setan hingga sore hari (HR. Hakim).</div>
+        </div>
+
+        <!-- Surat Al-Ikhlas, Al-Falaq, An-Nas -->
+        <div style="border-bottom:1px solid #E2E8F0;padding-bottom:10px">
+          <div style="font-weight:800;color:#064E3B">2. Mu'awwidzatain (Al-Ikhlas, Al-Falaq, An-Nas) (Masing-masing 3x)</div>
+          <div style="font-size:11.5px;color:#64748B">Keutamaan: Menjadi pelindung dari segala keburukan dan marabahaya (HR. Abu Dawud &amp; Tirmidzi).</div>
+        </div>
+
+        <!-- Sayyidul Istighfar -->
+        <div style="border-bottom:1px solid #E2E8F0;padding-bottom:10px">
+          <div style="font-weight:800;color:#064E3B">3. Sayyidul Istighfar (1x)</div>
+          <p style="font-family:'Amiri',serif;font-size:17px;line-height:1.8;direction:rtl;text-align:right;color:#0F172A;margin:6px 0">
+            اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ
+          </p>
+          <div style="font-size:11.5px;color:#64748B">Keutamaan: Barang siapa membacanya dengan yakin di pagi/sore hari lalu meninggal, ia termasuk penghuni surga (HR. Bukhari).</div>
+        </div>
+
+        <!-- Bismillahilladzi la yadhurru -->
+        <div>
+          <div style="font-weight:800;color:#064E3B">4. Perlindungan dari Marabahaya (3x)</div>
+          <p style="font-family:'Amiri',serif;font-size:17px;line-height:1.8;direction:rtl;text-align:right;color:#0F172A;margin:6px 0">
+            بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ
+          </p>
+          <div style="font-size:11.5px;color:#64748B">Keutamaan: Tidak akan ada mudharat/bahaya apa pun yang dapat mencelakainya (HR. Abu Dawud).</div>
+        </div>
+      </div>
+      <div style="margin-top:18px">
+        <button type="button" class="btn-submit-mutabaah" onclick="closeDzikirModal()">
+          <span>Tutup Bacaan ✓</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/roster-karyawan.js?v=20260914"></script>
+  <script src="js/cloud-sync.js?v=20260914"></script>
+  <script src="js/app.js?v=20260914"></script>
+</body>
+</html>

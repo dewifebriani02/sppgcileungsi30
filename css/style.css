@@ -1,0 +1,963 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   KPI IBADAH & ADAB KERJA — SPPG CILEUNGSI 30
+   Mobile-First Modern Islamic Stylesheet
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --primary: #064E3B;
+  --primary-dark: #022C22;
+  --primary-light: #0D9488;
+  --primary-subtle: #ECFDF5;
+  --primary-border: #A7F3D0;
+  
+  --accent-gold: #D97706;
+  --accent-gold-light: #FDE68A;
+  --accent-gold-subtle: #FFFBEB;
+
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --border: #E2E8F0;
+  --border-focus: #10B981;
+
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  --text-light: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 14px rgba(6,78,59,0.08), 0 2px 6px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 25px -3px rgba(6,78,59,0.12), 0 4px 10px -2px rgba(0,0,0,0.04);
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Amiri', serif;
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg);
+  color: var(--text-main);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding-bottom: 90px; /* Space for bottom navigation */
+}
+
+/* App Container - Constrained for Mobile First, Centered on Tablet/Desktop */
+.app-container {
+  max-width: 540px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  box-shadow: 0 0 40px rgba(0,0,0,0.04);
+}
+
+/* ── APP HEADER ── */
+.app-header {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: var(--text-inverse);
+  padding: 22px 18px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: 0 4px 16px rgba(2,44,34,0.18);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #A7F3D0;
+  border: 1px solid rgba(167,243,208,0.3);
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: #D1FAE5;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.btn-owner-portal-shortcut {
+  background: rgba(217,119,6,0.25);
+  border: 1px solid var(--accent-gold-light);
+  color: #FEF3C7;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.btn-owner-portal-shortcut:hover {
+  background: var(--accent-gold);
+  color: #FFFFFF;
+}
+
+/* ── USER IDENTITY STRIP ── */
+.user-identity-strip {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  top: 79px;
+  z-index: 30;
+  box-shadow: var(--shadow-sm);
+}
+
+.user-meta-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(13,148,136,0.25);
+  flex-shrink: 0;
+}
+
+.user-name-text {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.user-divisi-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-subtle);
+  padding: 1px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--primary-border);
+}
+
+.btn-switch-nik {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-switch-nik:hover {
+  background: #F1F5F9;
+  color: var(--text-main);
+  border-color: #CBD5E1;
+}
+
+/* ── DATE SELECTOR BAR ── */
+.date-selector-bar {
+  padding: 14px 18px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.date-label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-input-styled {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.date-input-styled:focus {
+  border-color: var(--border-focus);
+}
+
+.btn-today-pill {
+  background: var(--primary-subtle);
+  border: 1px solid var(--primary-border);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-today-pill:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ── SCORE METER CARD ── */
+.score-summary-card {
+  margin: 10px 18px 16px;
+  background: linear-gradient(135deg, #064E3B 0%, #0F3C31 100%);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(6,78,59,0.18);
+}
+
+.score-summary-card::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(217,119,6,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.score-title-sub {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #A7F3D0;
+  font-weight: 700;
+}
+
+.score-grade-text {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: #FEF3C7;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.score-desc-text {
+  font-size: 11.5px;
+  color: #E2E8F0;
+  margin-top: 4px;
+}
+
+.score-circle-wrapper {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-circle-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.score-circle-bg {
+  stroke: rgba(255,255,255,0.15);
+  stroke-width: 6;
+  fill: none;
+}
+
+.score-circle-progress {
+  stroke: #F59E0B;
+  stroke-width: 6;
+  stroke-linecap: round;
+  fill: none;
+  stroke-dasharray: 188.5; /* 2 * PI * 30 */
+  stroke-dashoffset: 40;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.score-circle-value {
+  position: absolute;
+  font-size: 16px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+/* ── FORM SECTIONS ── */
+.form-content-area {
+  padding: 0 18px 30px;
+  display: grid;
+  gap: 18px;
+}
+
+.section-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 16px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s;
+}
+
+.section-box:focus-within {
+  box-shadow: var(--shadow-md);
+  border-color: #CBD5E1;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.section-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-subtle);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.section-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: #F1F5F9;
+  color: var(--text-muted);
+}
+
+/* ── SHALAT FARDHU ROW ITEM ── */
+.shalat-list {
+  display: grid;
+  gap: 12px;
+}
+
+.shalat-row-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  transition: all 0.2s;
+}
+
+.shalat-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.shalat-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shalat-status-indicator {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Segmented Options for Shalat: Masjid, Jamaah, Sendiri, Udzur */
+.segmented-shalat-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.segment-btn {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.segment-btn span.sub {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.segment-btn:hover {
+  border-color: #CBD5E1;
+  background: #F8FAFC;
+}
+
+/* Active Segment Styles */
+.segment-btn.active-masjid {
+  background: #064E3B;
+  color: #FFFFFF;
+  border-color: #064E3B;
+  box-shadow: 0 2px 6px rgba(6,78,59,0.25);
+}
+.segment-btn.active-masjid span.sub {
+  color: #A7F3D0;
+}
+
+.segment-btn.active-jamaah {
+  background: #0D9488;
+  color: #FFFFFF;
+  border-color: #0D9488;
+  box-shadow: 0 2px 6px rgba(13,148,136,0.25);
+}
+.segment-btn.active-jamaah span.sub {
+  color: #CCFBF1;
+}
+
+.segment-btn.active-munfarid {
+  background: #475569;
+  color: #FFFFFF;
+  border-color: #475569;
+}
+.segment-btn.active-munfarid span.sub {
+  color: #CBD5E1;
+}
+
+.segment-btn.active-udzur {
+  background: #E0E7FF;
+  color: #4338CA;
+  border-color: #C7D2FE;
+}
+.segment-btn.active-udzur span.sub {
+  color: #6366F1;
+}
+
+/* ── CHECKBOX / TOGGLE ITEM (SHALAT SUNNAH & ADAB KERJA) ── */
+.checklist-group {
+  display: grid;
+  gap: 10px;
+}
+
+.check-item-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  user-select: none;
+}
+
+.check-item-card:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+.check-item-card.is-checked {
+  background: #F0FDF4;
+  border-color: #86EFAC;
+  box-shadow: 0 1px 4px rgba(34,197,94,0.1);
+}
+
+.custom-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.15s ease;
+  font-size: 13px;
+  color: transparent;
+}
+
+.check-item-card.is-checked .custom-checkbox {
+  background: #10B981;
+  border-color: #10B981;
+  color: #FFFFFF;
+}
+
+.check-item-content {
+  flex: 1;
+}
+
+.check-item-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.check-item-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.check-item-points {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-subtle);
+  padding: 1px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* ── NUMBER / INPUT FIELDS (TILAWAH & SEDEKAH) ── */
+.input-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.input-field-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-field-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.input-field-desc {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.input-stepper-box {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.btn-stepper {
+  width: 36px;
+  height: 38px;
+  background: #F8FAFC;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.btn-stepper:active {
+  background: #E2E8F0;
+}
+
+.input-stepper-value {
+  flex: 1;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+  outline: none;
+  width: 50px;
+}
+
+/* Select Dropdown Styled */
+.select-styled {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  outline: none;
+  cursor: pointer;
+}
+
+.select-styled:focus {
+  border-color: var(--border-focus);
+}
+
+/* Textarea Notes */
+.textarea-styled {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: #FFFFFF;
+  font-size: 13px;
+  color: var(--text-main);
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.textarea-styled:focus {
+  border-color: var(--border-focus);
+}
+
+/* ── SUBMIT FLOATING BUTTON BAR ── */
+.submit-action-wrapper {
+  margin-top: 10px;
+  padding: 10px 0 30px;
+}
+
+.btn-submit-mutabaah {
+  width: 100%;
+  background: linear-gradient(135deg, #064E3B 0%, #0D9488 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(6,78,59,0.28);
+  transition: all 0.2s ease;
+}
+
+.btn-submit-mutabaah:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(6,78,59,0.38);
+}
+
+.btn-submit-mutabaah:active {
+  transform: translateY(0);
+}
+
+.btn-submit-mutabaah:disabled {
+  background: #94A3B8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── BOTTOM NAVIGATION BAR (THUMB FRIENDLY) ── */
+.bottom-nav-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 540px;
+  background: #FFFFFF;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 6px 8px 10px;
+  z-index: 50;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+}
+
+.nav-tab-btn {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s;
+}
+
+.nav-tab-btn .nav-icon {
+  font-size: 18px;
+}
+
+.nav-tab-btn.active {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.nav-tab-btn.active .nav-icon {
+  transform: scale(1.1);
+}
+
+/* ── MODALS (SETUP NIK, OWNER PIN, BACAAN DZIKIR) ── */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15,23,42,0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end; /* Bottom sheet on mobile */
+  justify-content: center;
+  z-index: 99;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 520px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 24px 20px 32px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.active .modal-card {
+  transform: translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-close-modal {
+  background: #F1F5F9;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-full);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── SUCCESS NOTIFICATION TOAST ── */
+.toast-notice {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: #064E3B;
+  color: #FFFFFF;
+  padding: 12px 20px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 10px 25px rgba(6,78,59,0.3);
+  font-size: 13.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.toast-notice.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── CELEBRATION CONFETTI CANVAS ── */
+#confettiCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* ── RIWAYAT TAB STYLES ── */
+.history-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.history-card-item {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.history-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.history-card-date {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.history-score-pill {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: var(--primary-subtle);
+  color: var(--primary);
+}
+
+/* ── MEDIA QUERIES FOR DESKTOP ADJUSTMENTS ── */
+@media (min-width: 541px) {
+  .modal-overlay {
+    align-items: center;
+  }
+  .modal-card {
+    border-radius: var(--radius-lg);
+    transform: scale(0.95);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .modal-overlay.active .modal-card {
+    transform: scale(1);
+  }
+}
