@@ -6,7 +6,7 @@ Aplikasi ini dirancang khusus:
 - **Zero Login**: Karyawan cukup memasukkan NIK sekali saat pertama kali buka di ponsel, nama dan divisi langsung terisi otomatis dan tersimpan permanen di HP tanpa repot login password/email.
 - **Database Google Spreadsheet**: Data mutaba'ah langsung tercatat otomatis ke baris Google Spreadsheet secara *realtime* (owner bisa memantau spreadsheet langsung dari Google Drive di HP/laptop).
 - **Hosting 100% Gratis & Ringan**: Langsung siap di-host di **GitHub Pages (`github.io`)** atau **Vercel** tanpa butuh server/database berbayar.
-- **Portal Eksekutif Pimpinan**: Dilindungi PIN rahasia (PIN default: `8899` atau `2026`), dilengkapi analitik kepatuhan, leaderboard karyawan istiqomah, filter divisi, serta tombol **Download Excel (.xlsx)** dan cetak laporan.
+- **Portal Eksekutif Pimpinan**: Dilindungi PIN rahasia khusus Owner/Pimpinan, dilengkapi analitik kepatuhan, leaderboard karyawan istiqomah, filter divisi, serta tombol **Download Excel (.xlsx)** dan cetak laporan.
 
 ---
 
@@ -86,8 +86,7 @@ Aplikasi ini dapat langsung mengirimkan data ke Google Spreadsheet milik Anda:
 ## 🔒 Akses Portal Pimpinan & Owner
 
 - **URL Dashboard**: Buka `dashboard.html` atau klik tombol **"👑 Pimpinan"** di pojok kanan atas aplikasi.
-- **PIN Default**: `8899` (atau `2026`).
-- PIN dapat diubah kapan saja di menu **Pengaturan Spreadsheet & PIN**.
+- **PIN Keamanan**: Dilindungi PIN rahasia pimpinan (dapat diatur dan diubah kapan saja di menu **Pengaturan Spreadsheet & PIN**).
 
 ---
 
