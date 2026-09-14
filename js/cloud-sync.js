@@ -5,12 +5,14 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-// URL Google Apps Script Web App Default (Dapat diganti lewat Dashboard Pimpinan)
-const DEFAULT_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz_SPPG_CILEUNGSI_30_SAMPLE/exec";
+// URL Google Apps Script Web App Default Resmi SPPG Cileungsi 30
+let DEFAULT_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwNGWey3fWQyMDRckUBnjqLwZPHu-q6tN39J-ZsojFdPywMpDIDkUiuHqejfGeoUf-G9Q/exec";
 
-// Ambil URL Webhook aktif dari localStorage
+// Ambil URL Webhook aktif dari localStorage atau fallback default
 function getSheetsWebhookUrl() {
-  return localStorage.getItem('sppg_sheets_webhook_url') || '';
+  const localUrl = localStorage.getItem('sppg_sheets_webhook_url');
+  if (localUrl && localUrl.trim()) return localUrl.trim();
+  return DEFAULT_SHEETS_WEBHOOK_URL;
 }
 
 function saveSheetsWebhookUrl(url) {
