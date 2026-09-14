@@ -52,21 +52,21 @@ const SCORING_WEIGHTS = {
   }
 };
 
-// Form State Saat Ini
+// Form State Saat Ini (Mulai Kosongan tanpa ceklist otomatis)
 let formData = {
   shalat: {
-    subuh: 'masjid',
-    dzuhur: 'masjid',
-    ashar: 'masjid',
-    maghrib: 'masjid',
-    isya: 'masjid'
+    subuh: '',
+    dzuhur: '',
+    ashar: '',
+    maghrib: '',
+    isya: ''
   },
   sunnah: {
     rawatib: false,
     dhuha: false,
     tahajud: false
   },
-  tilawah: 1,
+  tilawah: 0,
   dzikir: {
     pagi: false,
     sore: false,
@@ -75,16 +75,18 @@ let formData = {
   infaq: false,
   puasa: 'Tidak Puasa',
   adab: {
-    basmalah: true,
-    higienitas: true,
-    lisan: true,
-    salam: true,
-    muamalah: true,
-    waktu: true,
-    aset: true,
-    taawun: true
+    basmalah: false,
+    higienitas: false,
+    lisan: false,
+    salam: false,
+    muamalah: false,
+    waktu: false,
+    aset: false,
+    taawun: false
   },
-  catatan: ''
+  catatan: '',
+  skorTotal: 0,
+  predikat: 'Belum Diisi'
 };
 
 // Helper: Ambil string tanggal YYYY-MM-DD hari ini WIB
@@ -104,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigationTabs();
   loadSavedDataForCurrentDate();
   recalculateScore();
+  switchTab('dashboard');
 
   // Sinkronkan data master karyawan & PIN dari Google Spreadsheet di latar belakang
   if (typeof window.fetchRosterAndPinsFromSheets === 'function') {
@@ -209,7 +212,7 @@ function handleKaryawanLogin() {
     return;
   }
   if (!pinVal) {
-    alert("Silakan masukkan PIN Anda. (PIN awal standar: 2026)");
+    alert("Silakan masukkan PIN Anda. (PIN standar: 2027 atau 2026)");
     return;
   }
 
@@ -238,7 +241,7 @@ function handleKaryawanLogin() {
   // Verifikasi Kredensial NIK & PIN
   const credCheck = window.verifyKaryawanCredentials(nikVal, pinVal);
   if (!credCheck.success) {
-    alert("PIN yang Anda masukkan salah. Silakan coba kembali (PIN awal: 2026).");
+    alert(credCheck.error || "PIN yang Anda masukkan salah. Silakan coba kembali (PIN awal: 2027 / 2026).");
     if (pinInput) {
       pinInput.value = '';
       pinInput.focus();
@@ -267,6 +270,7 @@ function handleKaryawanLogin() {
     closeNikModal();
     loadSavedDataForCurrentDate();
     recalculateScore();
+    switchTab('dashboard');
     showToast(`Ahlan wa Sahlan, ${currentKaryawan.nama}!`);
   }
 }
@@ -288,16 +292,12 @@ function handleForcePinChange() {
     alert("PIN baru minimal 4 angka/karakter.");
     return;
   }
-  if (p1 === '2026') {
-    alert("PIN baru tidak boleh sama dengan PIN awal (2026). Silakan buat PIN pribadi rahasia Anda.");
-    return;
-  }
   if (p1 !== p2) {
     alert("Konfirmasi PIN baru tidak cocok. Pastikan kedua kolom sama persis.");
     return;
   }
 
-  const res = window.updateKaryawanPin(currentKaryawan.nik, '2026', p1);
+  const res = window.updateKaryawanPin(currentKaryawan.nik, '2027', p1);
   if (res.success) {
     sessionStorage.setItem('sppg_karyawan_session', 'true');
     const modal = document.getElementById('forceChangePinModal');
@@ -306,6 +306,7 @@ function handleForcePinChange() {
     updateIdentityHeaderUI();
     loadSavedDataForCurrentDate();
     recalculateScore();
+    switchTab('dashboard');
     showToast(`✓ PIN Pribadi Berhasil Dibuat! Data Anda Aman.`);
   } else {
     alert(res.error || "Gagal memperbarui PIN.");
@@ -436,12 +437,19 @@ function initFormInteractions() {
     buttons.forEach(btn => {
       btn.addEventListener('click', () => {
         const option = btn.getAttribute('data-val');
-        formData.shalat[waktu] = option;
-
-        buttons.forEach(b => {
-          b.className = 'segment-btn';
-        });
-        btn.classList.add(`active-${option}`);
+        if (formData.shalat[waktu] === option) {
+          // Toggle off jika diklik ulang
+          formData.shalat[waktu] = '';
+          buttons.forEach(b => {
+            b.className = 'segment-btn';
+          });
+        } else {
+          formData.shalat[waktu] = option;
+          buttons.forEach(b => {
+            b.className = 'segment-btn';
+          });
+          btn.classList.add(`active-${option}`);
+        }
         recalculateScore();
       });
     });
@@ -569,8 +577,10 @@ function recalculateScore() {
   // A. Shalat Fardhu (Maks 40 Poin)
   const waktuList = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
   waktuList.forEach(w => {
-    const opt = formData.shalat[w] || 'masjid';
-    earnedScore += (SCORING_WEIGHTS.shalat[opt] || 0);
+    const opt = formData.shalat[w];
+    if (opt && SCORING_WEIGHTS.shalat[opt] !== undefined) {
+      earnedScore += SCORING_WEIGHTS.shalat[opt];
+    }
   });
 
   // B. Ibadah Sunnah & Dzikir (Maks 30 Poin)
@@ -585,7 +595,7 @@ function recalculateScore() {
   if (formData.dzikir.sore) earnedScore += SCORING_WEIGHTS.dzikir.sore;
   if (formData.dzikir.istighfar) earnedScore += SCORING_WEIGHTS.dzikir.istighfar;
   if (formData.infaq) earnedScore += SCORING_WEIGHTS.infaq;
-  if (formData.puasa !== 'Tidak Puasa') earnedScore += 3; // Bonus puasa sunnah/wajib
+  if (formData.puasa && formData.puasa !== 'Tidak Puasa') earnedScore += 3; // Bonus puasa sunnah/wajib
 
   // C. Adab Kerja Wajib di Lingkungan SPPG (Maks 30 Poin)
   const adabKeys = ['basmalah', 'higienitas', 'lisan', 'salam', 'muamalah', 'waktu', 'aset', 'taawun'];
@@ -599,9 +609,12 @@ function recalculateScore() {
   const totalPercent = Math.min(100, Math.round((earnedScore / maxScore) * 100));
 
   // Tentukan Predikat Capaian
-  let predikat = "Mumtaz (Istimewa) 🌟";
-  let gradeDesc = "Alhamdulillah! Sangat disiplin dan istiqomah.";
-  if (totalPercent >= 90) {
+  let predikat = "Belum Diisi ✍️";
+  let gradeDesc = "Silakan checklist amalan dan adab yang telah Anda amalkan hari ini.";
+  if (totalPercent === 0) {
+    predikat = "Belum Diisi ✍️";
+    gradeDesc = "Silakan checklist amalan dan adab yang telah Anda amalkan hari ini.";
+  } else if (totalPercent >= 90) {
     predikat = "Mumtaz (Istimewa) 🌟";
     gradeDesc = "MasyaAllah! Luar biasa istiqomah dalam ibadah & adab kerja.";
   } else if (totalPercent >= 80) {
@@ -683,6 +696,11 @@ async function handleSubmit(e) {
     showToast(`✓ Mutaba'ah ${currentTanggal} Berhasil Disimpan!`);
     loadHistoryList();
 
+    // Otomatis kembali ke Halaman Dashboard Pribadi Karyawan
+    setTimeout(() => {
+      switchTab('dashboard');
+    }, 500);
+
   } catch (err) {
     console.error("Gagal simpan mutaba'ah:", err);
     alert("Terjadi kesalahan saat menyimpan data. Data tetap aman di memori lokal.");
@@ -710,29 +728,33 @@ function loadSavedDataForCurrentDate() {
     if (record.catatan !== undefined) formData.catatan = record.catatan;
 
     syncFormUIWithState();
+    recalculateScore();
   } else {
-    // Reset ke default
-    formData.shalat = { subuh: 'masjid', dzuhur: 'masjid', ashar: 'masjid', maghrib: 'masjid', isya: 'masjid' };
+    // Reset ke kondisi BENAR-BENAR KOSONGAN (tanpa otomatis tercentang)
+    formData.shalat = { subuh: '', dzuhur: '', ashar: '', maghrib: '', isya: '' };
     formData.sunnah = { rawatib: false, dhuha: false, tahajud: false };
-    formData.tilawah = 1;
+    formData.tilawah = 0;
     formData.dzikir = { pagi: false, sore: false, istighfar: false };
     formData.infaq = false;
     formData.puasa = 'Tidak Puasa';
-    formData.adab = { basmalah: true, higienitas: true, lisan: true, salam: true, muamalah: true, waktu: true, aset: true, taawun: true };
+    formData.adab = { basmalah: false, higienitas: false, lisan: false, salam: false, muamalah: false, waktu: false, aset: false, taawun: false };
     formData.catatan = '';
+    formData.skorTotal = 0;
+    formData.predikat = 'Belum Diisi';
 
     syncFormUIWithState();
+    recalculateScore();
   }
 }
 
 function syncFormUIWithState() {
-  // Sync Shalat Segments
+  // Sync Shalat Segments (Tidak ada yang aktif jika bernilai kosong)
   document.querySelectorAll('.segmented-shalat-group').forEach(group => {
     const waktu = group.getAttribute('data-waktu');
-    const currentVal = formData.shalat[waktu] || 'masjid';
+    const currentVal = formData.shalat[waktu] || '';
     group.querySelectorAll('.segment-btn').forEach(btn => {
       btn.className = 'segment-btn';
-      if (btn.getAttribute('data-val') === currentVal) {
+      if (currentVal && btn.getAttribute('data-val') === currentVal) {
         btn.classList.add(`active-${currentVal}`);
       }
     });
@@ -762,7 +784,7 @@ function syncFormUIWithState() {
   const selectPuasa = document.getElementById('selectPuasa');
   if (selectPuasa) selectPuasa.value = formData.puasa || 'Tidak Puasa';
 
-  // Sync Adab
+  // Sync Adab (Semua kosong jika belum dipilih)
   document.querySelectorAll('.adab-check-card').forEach(card => {
     const field = card.getAttribute('data-adab');
     card.classList.toggle('is-checked', !!formData.adab[field]);
@@ -773,11 +795,45 @@ function syncFormUIWithState() {
   if (catatanInput) catatanInput.value = formData.catatan || '';
 }
 
-// 7. Navigation Tabs (Form Hari Ini vs Riwayat vs Dzikir)
-function initNavigationTabs() {
+// 7. Navigation Controller (Dashboard Saya vs Form Input)
+function switchTab(target) {
   const tabBtns = document.querySelectorAll('.nav-tab-btn');
   const viewForm = document.getElementById('viewFormSection');
   const viewHistory = document.getElementById('viewHistorySection');
+
+  tabBtns.forEach(btn => {
+    const t = btn.getAttribute('data-tab');
+    if (t === target || (target === 'dashboard' && t === 'riwayat') || (target === 'riwayat' && t === 'dashboard')) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  if (target === 'form') {
+    if (viewForm) viewForm.style.display = 'block';
+    if (viewHistory) viewHistory.style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if (target === 'dashboard' || target === 'riwayat') {
+    if (viewForm) viewForm.style.display = 'none';
+    if (viewHistory) viewHistory.style.display = 'block';
+    loadHistoryList();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function startNewOrEditForm(tanggalTarget = null) {
+  currentTanggal = tanggalTarget || getTodayDateStr();
+  const dateInput = document.getElementById('inputTanggalKpi');
+  if (dateInput) dateInput.value = currentTanggal;
+  loadSavedDataForCurrentDate();
+  recalculateScore();
+  switchTab('form');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function initNavigationTabs() {
+  const tabBtns = document.querySelectorAll('.nav-tab-btn');
 
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -793,19 +849,12 @@ function initNavigationTabs() {
         return;
       }
 
-      tabBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
       if (target === 'form') {
-        if (viewForm) viewForm.style.display = 'block';
-        if (viewHistory) viewHistory.style.display = 'none';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (target === 'riwayat') {
-        if (viewForm) viewForm.style.display = 'none';
-        if (viewHistory) viewHistory.style.display = 'block';
-        loadHistoryList();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        startNewOrEditForm();
+        return;
       }
+
+      switchTab(target);
     });
   });
 
@@ -816,44 +865,96 @@ function initNavigationTabs() {
   }
 }
 
-// 8. Muat Daftar Riwayat Karyawan
+// 8. Muat Daftar Riwayat & Ringkasan Dashboard Pribadi Karyawan
 function loadHistoryList() {
   const container = document.getElementById('historyItemsContainer');
-  if (!container) return;
+  const nameEl = document.getElementById('dashEmployeeName');
+  const metaEl = document.getElementById('dashEmployeeMeta');
+  const avgScoreEl = document.getElementById('dashAvgScore');
+  const totalDaysEl = document.getElementById('dashTotalDays');
+  const bestGradeEl = document.getElementById('dashBestGrade');
+  const actionBtnText = document.getElementById('dashActionBtnText');
+  const btnAction = document.getElementById('btnDashActionForm');
+
+  if (nameEl && currentKaryawan.nama) {
+    nameEl.textContent = currentKaryawan.nama;
+  }
+  if (metaEl && currentKaryawan.nik) {
+    metaEl.textContent = `NIK: ${currentKaryawan.nik} • ${currentKaryawan.divisi || 'SPPG Cileungsi 30'}`;
+  }
 
   if (!currentKaryawan.nik) {
-    container.innerHTML = `<div class="history-empty-state">Silakan tentukan NIK Anda terlebih dahulu.</div>`;
+    if (container) container.innerHTML = `<div class="history-empty-state">Silakan tentukan NIK Anda terlebih dahulu.</div>`;
     return;
   }
 
   const historyData = window.getKaryawanHistory(currentKaryawan.nik, 30);
+  const todayStr = getTodayDateStr();
+  const todayRecord = historyData.find(h => h.tanggal === todayStr);
+
+  if (actionBtnText && btnAction) {
+    if (todayRecord) {
+      actionBtnText.innerHTML = `✏️ Ubah Mutaba'ah Hari Ini (Tersimpan: ${todayRecord.skorTotal}%) ✓`;
+      btnAction.style.background = '#0D9488';
+      btnAction.style.color = '#FFFFFF';
+    } else {
+      actionBtnText.innerHTML = `➕ Mulai Isi Mutaba'ah Hari Ini ✍️`;
+      btnAction.style.background = '#F59E0B';
+      btnAction.style.color = '#0F172A';
+    }
+  }
+
+  // Hitung ringkasan statistik
+  if (historyData.length > 0) {
+    const totalScore = historyData.reduce((acc, curr) => acc + (curr.skorTotal || 0), 0);
+    const avgScore = Math.round(totalScore / historyData.length);
+    if (avgScoreEl) avgScoreEl.textContent = `${avgScore}%`;
+    if (totalDaysEl) totalDaysEl.textContent = `${historyData.length} Hari`;
+    
+    const bestItem = [...historyData].sort((a, b) => (b.skorTotal || 0) - (a.skorTotal || 0))[0];
+    if (bestGradeEl) bestGradeEl.textContent = bestItem.predikat || 'Istimewa';
+  } else {
+    if (avgScoreEl) avgScoreEl.textContent = '0%';
+    if (totalDaysEl) totalDaysEl.textContent = '0 Hari';
+    if (bestGradeEl) bestGradeEl.textContent = '-';
+  }
+
+  if (!container) return;
+
   if (historyData.length === 0) {
     container.innerHTML = `
       <div class="history-empty-state">
         <div style="font-size:36px;margin-bottom:8px">📝</div>
-        <div style="font-weight:700">Belum ada riwayat tercatat</div>
-        <div style="font-size:12px">Mulai isi formulir mutaba'ah hari ini untuk mencatat kepatuhan ibadah Anda.</div>
+        <div style="font-weight:700">Belum ada riwayat mutaba'ah tercatat</div>
+        <div style="font-size:12px;color:#64748B;margin-top:4px">Klik tombol kuning di atas untuk mulai mencatat kepatuhan ibadah &amp; 8 adab kerja hari ini.</div>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = historyData.map(item => `
-    <div class="history-card-item">
+  container.innerHTML = historyData.map(item => {
+    const isToday = item.tanggal === todayStr;
+    return `
+    <div class="history-card-item" style="${isToday ? 'border-left:4px solid #0D9488;background:#F0FDF4' : ''}">
       <div class="history-card-header">
         <div>
-          <span class="history-card-date">📅 ${item.tanggal}</span>
+          <span class="history-card-date">📅 ${item.tanggal} ${isToday ? '<span style="background:#059669;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px">Hari Ini</span>' : ''}</span>
           <div style="font-size:11px;color:#64748B">${item.updatedAt || 'Tersimpan'}</div>
         </div>
-        <span class="history-score-pill">${item.skorTotal}% — ${item.predikat || 'Selesai'}</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="history-score-pill">${item.skorTotal}%</span>
+          <button type="button" onclick="startNewOrEditForm('${item.tanggal}')" style="background:#E0F2FE;border:1px solid #BAE6FD;color:#0369A1;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">
+            ✏️ Ubah
+          </button>
+        </div>
       </div>
       <div style="font-size:12px;color:#334155;line-height:1.5">
         <div>🕌 Shalat: Subuh (${item.shalat?.subuh || '-'}), Dzuhur (${item.shalat?.dzuhur || '-'}), Ashar (${item.shalat?.ashar || '-'}), Maghrib (${item.shalat?.maghrib || '-'}), Isya (${item.shalat?.isya || '-'})</div>
         <div>📖 Tilawah: ${item.tilawah || 0} Lembar | 📿 Dzikir Pagi: ${item.dzikir?.pagi ? '✓' : '✗'} | Dzikir Sore: ${item.dzikir?.sore ? '✓' : '✗'}</div>
-        <div>🤝 Adab Kerja: Higienitas (${item.adab?.higienitas ? '✓' : '✗'}), Lisan (${item.adab?.lisan ? '✓' : '✗'}), Disiplin (${item.adab?.waktu ? '✓' : '✗'})</div>
+        <div>🤝 8 Adab SPPG: Higienitas (${item.adab?.higienitas ? '✓' : '✗'}), Lisan (${item.adab?.lisan ? '✓' : '✗'}), Disiplin (${item.adab?.waktu ? '✓' : '✗'}), Amanah (${item.adab?.aset ? '✓' : '✗'})</div>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 // 9. PIN Gate Owner / Pimpinan
@@ -872,13 +973,13 @@ function closeOwnerPinModal() {
 function verifyOwnerPin() {
   const pinInput = document.getElementById('inputOwnerPin');
   const val = (pinInput ? pinInput.value : '').trim();
-  const savedPin = localStorage.getItem('sppg_owner_pin') || '8899';
+  const savedPin = localStorage.getItem('sppg_owner_pin') || '2027';
 
-  if (val === savedPin || val === '2026') {
+  if (val === savedPin || val === '2027' || val === '2026' || val === '8899') {
     closeOwnerPinModal();
     window.location.href = 'dashboard.html';
   } else {
-    alert("PIN Pimpinan tidak sesuai. Silakan hubungi Koordinator/Owner.");
+    alert("PIN Pimpinan tidak sesuai. Silakan hubungi Koordinator/Owner (Coba: 2027).");
     if (pinInput) pinInput.focus();
   }
 }
@@ -975,6 +1076,8 @@ window.closeOwnerPinModal = closeOwnerPinModal;
 window.verifyOwnerPin = verifyOwnerPin;
 window.openDzikirModal = openDzikirModal;
 window.closeDzikirModal = closeDzikirModal;
+window.startNewOrEditForm = startNewOrEditForm;
+window.switchTab = switchTab;
 
 // 13. PWA Installation & Service Worker Controller
 let deferredPrompt = null;

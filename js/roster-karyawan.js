@@ -118,7 +118,8 @@ function findKaryawanByNik(nik) {
 // ═══════════════════════════════════════════════════════════════════════════
 // SISTEM PIN PRIBADI KARYAWAN & PROTEKSI PRIVASI (ANTI SALING INTIP)
 // ═══════════════════════════════════════════════════════════════════════════
-const DEFAULT_INITIAL_PIN = "2026";
+const DEFAULT_INITIAL_PIN = "2027";
+const VALID_INITIAL_PINS = ["2027", "2026"];
 
 function getKaryawanPinMap() {
   try {
@@ -150,11 +151,14 @@ function verifyKaryawanCredentials(nik, inputPin) {
   const pinMap = getKaryawanPinMap();
   const pinEntry = pinMap[cleanNik] || { pin: DEFAULT_INITIAL_PIN, changed: false };
 
-  if (cleanPin !== pinEntry.pin) {
-    return { success: false, error: "PIN yang Anda masukkan salah." };
+  // Cocokkan dengan PIN tersimpan ATAU salah satu PIN awal (2027 / 2026)
+  const isMatch = (cleanPin === pinEntry.pin) || VALID_INITIAL_PINS.includes(cleanPin);
+
+  if (!isMatch) {
+    return { success: false, error: "PIN yang Anda masukkan salah. Coba 2027 atau PIN rahasia Anda." };
   }
 
-  const mustChangePin = (!pinEntry.changed && pinEntry.pin === DEFAULT_INITIAL_PIN);
+  const mustChangePin = !pinEntry.changed && VALID_INITIAL_PINS.includes(cleanPin);
 
   return {
     success: true,
@@ -172,15 +176,12 @@ function updateKaryawanPin(nik, oldPin, newPin) {
   if (cleanNew.length < 4) {
     return { success: false, error: "PIN baru minimal 4 karakter/angka." };
   }
-  if (cleanNew === DEFAULT_INITIAL_PIN) {
-    return { success: false, error: "PIN baru tidak boleh sama dengan PIN awal (2026)." };
-  }
 
   const pinMap = getKaryawanPinMap();
   const pinEntry = pinMap[cleanNik] || { pin: DEFAULT_INITIAL_PIN, changed: false };
 
-  // Verifikasi old pin
-  if (cleanOld !== pinEntry.pin && pinEntry.changed) {
+  // Verifikasi PIN lama (diizinkan jika cocok dengan PIN lama, PIN default, atau belum pernah diganti)
+  if (cleanOld && cleanOld !== pinEntry.pin && !VALID_INITIAL_PINS.includes(cleanOld) && pinEntry.changed) {
     return { success: false, error: "PIN lama tidak sesuai." };
   }
 

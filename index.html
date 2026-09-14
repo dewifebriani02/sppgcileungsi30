@@ -67,8 +67,16 @@
     </div>
 
     <!-- ── VIEW 1: FORM INPUT MUTABA'AH HARI INI ── -->
-    <main id="viewFormSection">
+    <main id="viewFormSection" style="display:none">
       
+      <!-- Top Return to Dashboard Action Bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 2px">
+        <button type="button" onclick="switchTab('dashboard')" style="background:#F1F5F9;border:1px solid #CBD5E1;color:#1E293B;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer">
+          <span>← Kembali ke Dashboard</span>
+        </button>
+        <span style="font-size:11.5px;color:#64748B;font-weight:600">📝 Form Pengisian</span>
+      </div>
+
       <!-- Date Selector Bar -->
       <div class="date-selector-bar">
         <div class="date-label-wrapper">
@@ -82,15 +90,15 @@
       <div class="score-summary-card">
         <div>
           <div class="score-title-sub">Indeks Capaian Hari Ini</div>
-          <div class="score-grade-text" id="scoreGradeText">Mumtaz (Istimewa) 🌟</div>
-          <div class="score-desc-text" id="scoreDescText">Alhamdulillah! Sangat disiplin dan istiqomah.</div>
+          <div class="score-grade-text" id="scoreGradeText">Belum Diisi ✍️</div>
+          <div class="score-desc-text" id="scoreDescText">Silakan checklist amalan dan adab yang telah Anda amalkan hari ini.</div>
         </div>
         <div class="score-circle-wrapper">
           <svg class="score-circle-svg" viewBox="0 0 70 70">
             <circle class="score-circle-bg" cx="35" cy="35" r="30"></circle>
-            <circle class="score-circle-progress" id="scoreCircleSvgProgress" cx="35" cy="35" r="30"></circle>
+            <circle class="score-circle-progress" id="scoreCircleSvgProgress" cx="35" cy="35" r="30" style="stroke-dashoffset: 188.5;"></circle>
           </svg>
-          <div class="score-circle-value" id="scorePercentageValue">100%</div>
+          <div class="score-circle-value" id="scorePercentageValue">0%</div>
         </div>
       </div>
 
@@ -119,7 +127,7 @@
                 <span class="shalat-status-indicator">Pilih Status:</span>
               </div>
               <div class="segmented-shalat-group" data-waktu="subuh">
-                <div class="segment-btn active-masjid" data-val="masjid">
+                <div class="segment-btn" data-val="masjid">
                   <span>Masjid</span>
                   <span class="sub">+100</span>
                 </div>
@@ -145,7 +153,7 @@
                 <span class="shalat-status-indicator">Pilih Status:</span>
               </div>
               <div class="segmented-shalat-group" data-waktu="dzuhur">
-                <div class="segment-btn active-masjid" data-val="masjid">
+                <div class="segment-btn" data-val="masjid">
                   <span>Masjid</span>
                   <span class="sub">+100</span>
                 </div>
@@ -171,7 +179,7 @@
                 <span class="shalat-status-indicator">Pilih Status:</span>
               </div>
               <div class="segmented-shalat-group" data-waktu="ashar">
-                <div class="segment-btn active-masjid" data-val="masjid">
+                <div class="segment-btn" data-val="masjid">
                   <span>Masjid</span>
                   <span class="sub">+100</span>
                 </div>
@@ -197,7 +205,7 @@
                 <span class="shalat-status-indicator">Pilih Status:</span>
               </div>
               <div class="segmented-shalat-group" data-waktu="maghrib">
-                <div class="segment-btn active-masjid" data-val="masjid">
+                <div class="segment-btn" data-val="masjid">
                   <span>Masjid</span>
                   <span class="sub">+100</span>
                 </div>
@@ -223,7 +231,7 @@
                 <span class="shalat-status-indicator">Pilih Status:</span>
               </div>
               <div class="segmented-shalat-group" data-waktu="isya">
-                <div class="segment-btn active-masjid" data-val="masjid">
+                <div class="segment-btn" data-val="masjid">
                   <span>Masjid</span>
                   <span class="sub">+100</span>
                 </div>
@@ -307,7 +315,7 @@
               <label class="input-field-label">📖 Tilawah Quran:</label>
               <div class="input-stepper-box">
                 <button type="button" class="btn-stepper" id="btnTilawahMinus">−</button>
-                <input type="number" id="tilawahValue" class="input-stepper-value" value="1" min="0">
+                <input type="number" id="tilawahValue" class="input-stepper-value" value="0" min="0">
                 <button type="button" class="btn-stepper" id="btnTilawahPlus">+</button>
               </div>
               <span class="input-field-desc">Lembar / Halaman</span>
@@ -391,7 +399,7 @@
           <div class="checklist-group">
             
             <!-- Adab 1: Basmalah & Hamdalah -->
-            <div class="check-item-card adab-check-card is-checked" data-adab="basmalah">
+            <div class="check-item-card adab-check-card" data-adab="basmalah">
               <div class="custom-checkbox">✓</div>
               <div class="check-item-content">
                 <div class="check-item-title">1. Basmalah &amp; Niat Lillahi Ta'ala</div>
@@ -401,7 +409,7 @@
             </div>
 
             <!-- Adab 2: Thaharah & Higienitas -->
-            <div class="check-item-card adab-check-card is-checked" data-adab="higienitas">
+            <div class="check-item-card adab-check-card" data-adab="higienitas">
               <div class="custom-checkbox">✓</div>
               <div class="check-item-content">
                 <div class="check-item-title">2. Thaharah &amp; Higienitas Dapur</div>
@@ -411,7 +419,7 @@
             </div>
 
             <!-- Adab 3: Menjaga Lisan -->
-            <div class="check-item-card adab-check-card is-checked" data-adab="lisan">
+            <div class="check-item-card adab-check-card" data-adab="lisan">
               <div class="custom-checkbox">✓</div>
               <div class="check-item-content">
                 <div class="check-item-title">3. Menjaga Lisan (Bebas Ghibah)</div>
@@ -421,7 +429,7 @@
             </div>
 
             <!-- Adab 4: 5S Salam -->
-            <div class="check-item-card adab-check-card is-checked" data-adab="salam">
+            <div class="check-item-card adab-check-card" data-adab="salam">
               <div class="custom-checkbox">✓</div>
               <div class="check-item-content">
                 <div class="check-item-title">4. Budaya 5S &amp; Tebar Salam</div>
@@ -431,7 +439,7 @@
             </div>
 
             <!-- Adab 5: Muamalah Lawan Jenis -->
-            <div class="check-item-card adab-check-card is-checked" data-adab="muamalah">
+            <div class="check-item-card adab-check-card" data-adab="muamalah">
               <div class="custom-checkbox">✓</div>
               <div class="check-item-content">
                 <div class="check-item-title">5. Batasan Sopan dengan Lawan Jenis</div>
@@ -441,7 +449,7 @@
             </div>
 
             <!-- Adab 6: Amanah Waktu -->
-            <div class="check-item-card adab-check-card is-checked" data-adab="waktu">
+            <div class="check-item-card adab-check-card" data-adab="waktu">
               <div class="custom-checkbox">✓</div>
               <div class="check-item-content">
                 <div class="check-item-title">6. Amanah Waktu &amp; Kedisiplinan</div>
@@ -451,7 +459,7 @@
             </div>
 
             <!-- Adab 7: Amanah Bahan & Aset -->
-            <div class="check-item-card adab-check-card is-checked" data-adab="aset">
+            <div class="check-item-card adab-check-card" data-adab="aset">
               <div class="custom-checkbox">✓</div>
               <div class="check-item-content">
                 <div class="check-item-title">7. Amanah Bahan Pangan &amp; Aset SPPG</div>
@@ -461,7 +469,7 @@
             </div>
 
             <!-- Adab 8: Ta'awun Kerja Tim -->
-            <div class="check-item-card adab-check-card is-checked" data-adab="taawun">
+            <div class="check-item-card adab-check-card" data-adab="taawun">
               <div class="custom-checkbox">✓</div>
               <div class="check-item-content">
                 <div class="check-item-title">8. Tolong-Menolong (Ta'awun)</div>
@@ -500,14 +508,49 @@
       </div>
     </main>
 
-    <!-- ── VIEW 2: RIWAYAT MUTABA'AH SAYA ── -->
-    <section id="viewHistorySection" style="display:none;padding:18px 18px 40px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div>
-          <h2 style="font-size:18px;font-weight:800;color:#0F172A">📜 Riwayat Mutaba'ah Saya</h2>
-          <p style="font-size:12px;color:#64748B">Catatan kepatuhan ibadah &amp; adab 30 hari terakhir</p>
+    <!-- ── VIEW 2: DASHBOARD PRIBADI KARYAWAN & RIWAYAT MUTABA'AH ── -->
+    <section id="viewHistorySection" style="display:block;padding:16px 16px 48px">
+      <!-- Welcome Hero Banner -->
+      <div style="background:linear-gradient(135deg, #064E3B, #0D9488);border-radius:14px;padding:18px;color:#fff;margin-bottom:16px;box-shadow:0 8px 24px rgba(6,78,59,0.18);position:relative;overflow:hidden">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:11px;color:#A7F3D0;text-transform:uppercase;letter-spacing:0.08em;font-weight:700">Dashboard Pribadi Karyawan</div>
+            <div id="dashEmployeeName" style="font-size:18px;font-weight:800;margin-top:3px;line-height:1.2">-</div>
+            <div id="dashEmployeeMeta" style="font-size:12px;color:#CCFBF1;margin-top:3px">SPPG Cileungsi 30</div>
+          </div>
+          <div style="font-size:36px;opacity:0.9">📊</div>
+        </div>
+
+        <!-- Tombol Aksi Utama: Mulai Isi Baru / Ubah Mutaba'ah Hari Ini -->
+        <button type="button" id="btnDashActionForm" onclick="startNewOrEditForm()" style="width:100%;background:#F59E0B;color:#0F172A;border:none;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,0.3);transition:all 0.15s ease">
+          <span id="dashActionBtnText">➕ Isi Mutaba'ah Hari Ini ✍️</span>
+        </button>
+      </div>
+
+      <!-- Ringkasan Statistik 30 Hari -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+          <div style="font-size:11px;color:#64748B;font-weight:700">Rata-Rata Skor</div>
+          <div id="dashAvgScore" style="font-size:17px;font-weight:800;color:#064E3B;margin-top:2px">0%</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+          <div style="font-size:11px;color:#64748B;font-weight:700">Hari Terisi</div>
+          <div id="dashTotalDays" style="font-size:17px;font-weight:800;color:#0D9488;margin-top:2px">0 Hari</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+          <div style="font-size:11px;color:#64748B;font-weight:700">Predikat Terbaik</div>
+          <div id="dashBestGrade" style="font-size:12px;font-weight:800;color:#B45309;margin-top:4px">-</div>
         </div>
       </div>
+
+      <!-- Header Riwayat -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <h2 style="font-size:15px;font-weight:800;color:#0F172A">📜 Catatan Mutaba'ah Saya</h2>
+          <p style="font-size:11.5px;color:#64748B">Rekam jejak kepatuhan ibadah &amp; 8 adab kerja SPPG</p>
+        </div>
+      </div>
+
       <div id="historyItemsContainer">
         <!-- Riwayat dimuat lewat JavaScript -->
       </div>
@@ -515,13 +558,13 @@
 
     <!-- ── BOTTOM NAVIGATION BAR ── -->
     <nav class="bottom-nav-bar">
-      <button type="button" class="nav-tab-btn active" data-tab="form">
-        <span class="nav-icon">📝</span>
-        <span>Formulir</span>
+      <button type="button" class="nav-tab-btn active" data-tab="dashboard" id="navTabDashboard">
+        <span class="nav-icon">📊</span>
+        <span>Dashboard</span>
       </button>
-      <button type="button" class="nav-tab-btn" data-tab="riwayat">
-        <span class="nav-icon">📜</span>
-        <span>Riwayat</span>
+      <button type="button" class="nav-tab-btn" data-tab="form" id="navTabForm">
+        <span class="nav-icon">📝</span>
+        <span>Isi Form</span>
       </button>
       <button type="button" class="nav-tab-btn" data-tab="dzikir-sunnah">
         <span class="nav-icon">📿</span>
@@ -559,7 +602,7 @@
           <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">PIN Rahasia Karyawan:</label>
           <input type="password" id="modalPinInput" maxlength="8" placeholder="Masukkan PIN Anda..." class="date-input-styled" style="width:100%;font-size:16px;letter-spacing:0.2em">
           <div style="font-size:11px;color:#059669;margin-top:4px;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0">
-            ℹ️ PIN awal karyawan: <strong>2026</strong>. Anda wajib membuat PIN baru pribadi setelah masuk.
+            ℹ️ PIN awal karyawan: <strong>2027</strong> (atau 2026). Anda dapat membuat PIN baru pribadi setelah masuk.
           </div>
         </div>
 
@@ -591,7 +634,7 @@
       </div>
       <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px;font-size:12.5px;color:#92400E;margin-bottom:14px;line-height:1.5">
         <strong>Demi Privasi Amal Ibadah Anda:</strong><br>
-        Anda masih menggunakan PIN standar (2026). Untuk memastikan rekan kerja tidak bisa saling intip atau mengubah catatan ibadah Anda, <strong>wajib membuat PIN pribadi baru</strong> (minimal 4 digit).
+        Anda masih menggunakan PIN standar (2027 / 2026). Untuk memastikan rekan kerja tidak bisa saling intip atau mengubah catatan ibadah Anda, <strong>wajib membuat PIN pribadi baru</strong> (minimal 4 digit).
       </div>
 
       <div style="display:grid;gap:12px">
@@ -748,8 +791,8 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/roster-karyawan.js?v=20260914"></script>
-  <script src="js/cloud-sync.js?v=20260914"></script>
-  <script src="js/app.js?v=20260914"></script>
+  <script src="js/roster-karyawan.js?v=20260914_pin2027"></script>
+  <script src="js/cloud-sync.js?v=20260914_pin2027"></script>
+  <script src="js/app.js?v=20260914_pin2027"></script>
 </body>
 </html>

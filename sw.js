@@ -5,17 +5,17 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-const CACHE_NAME = 'sppg30-pwa-v1';
+const CACHE_NAME = 'sppg30-pwa-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './dashboard.html',
   './css/style.css?v=20260914',
   './css/dashboard.css?v=20260914',
-  './js/app.js?v=20260914',
-  './js/cloud-sync.js?v=20260914',
-  './js/dashboard.js?v=20260914',
-  './js/roster-karyawan.js?v=20260914',
+  './js/app.js?v=20260914_pin2027',
+  './js/cloud-sync.js?v=20260914_pin2027',
+  './js/dashboard.js?v=20260914_pin2027',
+  './js/roster-karyawan.js?v=20260914_pin2027',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
