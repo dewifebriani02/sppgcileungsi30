@@ -272,6 +272,31 @@ function doGet(e) {
 
     const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : 'GET_REKAP';
 
+    // ── 0. UPDATE PIN VIA GET (DUAL SUPPORT) ──
+    if (action === 'UPDATE_PIN') {
+      const nikTarget = String((e.parameter && e.parameter.nik) || '').trim().toUpperCase();
+      const newPin = String((e.parameter && e.parameter.pin) || '').trim();
+      const nowStr = Utilities.formatDate(new Date(), "Asia/Jakarta", "yyyy-MM-dd HH:mm:ss");
+
+      if (nikTarget && newPin) {
+        const data = sheetKaryawan.getDataRange().getValues();
+        let foundRow = -1;
+        for (let i = 1; i < data.length; i++) {
+          if (String(data[i][0]).trim().toUpperCase() === nikTarget) {
+            foundRow = i + 1;
+            break;
+          }
+        }
+        if (foundRow > 0) {
+          sheetKaryawan.getRange(foundRow, 6).setValue("'" + newPin);
+          sheetKaryawan.getRange(foundRow, 7).setValue("Sudah Ganti");
+          sheetKaryawan.getRange(foundRow, 9).setValue(nowStr);
+          return createJsonResponse({ status: "success", message: "PIN berhasil diperbarui", nik: nikTarget });
+        }
+      }
+      return createJsonResponse({ status: "error", message: "NIK tidak ditemukan atau parameter kurang" });
+    }
+
     // ── 1. AMBIL MASTER DATA KARYAWAN & STATUS PIN ──
     if (action === 'GET_KARYAWAN') {
       const dataKaryawan = sheetKaryawan.getDataRange().getValues();
