@@ -195,6 +195,85 @@ async function fetchAllSubmissions(forceRefresh = false) {
   return localData;
 }
 
+// 7. Sinkronisasi Update PIN ke Google Spreadsheet (Sheet: Data_Karyawan)
+async function syncPinUpdateToSheets(nik, newPin, nama = '', divisi = '') {
+  const webhookUrl = getSheetsWebhookUrl();
+  if (!webhookUrl || !webhookUrl.startsWith('https://script.google.com/')) {
+    return { success: true, localOnly: true };
+  }
+
+  try {
+    const payload = {
+      action: 'UPDATE_PIN',
+      nik: String(nik).trim().toUpperCase(),
+      pin: String(newPin).trim(),
+      nama: nama,
+      divisi: divisi
+    };
+
+    await fetch(webhookUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    console.log(`✓ PIN ${nik} berhasil disinkronkan ke Google Spreadsheet (Data_Karyawan).`);
+    return { success: true, synced: true };
+  } catch (err) {
+    console.warn("Gagal menyinkronkan PIN ke spreadsheet:", err);
+    return { success: false, error: err };
+  }
+}
+
+// 8. Tarik Master Karyawan & Status PIN dari Google Spreadsheet (Sheet: Data_Karyawan)
+async function fetchRosterAndPinsFromSheets() {
+  const webhookUrl = getSheetsWebhookUrl();
+  if (!webhookUrl || !webhookUrl.startsWith('https://script.google.com/')) return null;
+
+  try {
+    const res = await fetch(`${webhookUrl}?action=GET_KARYAWAN`);
+    if (!res.ok) return null;
+    const json = await res.json();
+
+    if (json && json.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
+      // 1. Update master roster lokal
+      const newRoster = json.data.map(k => ({
+        nik: k.nik,
+        nama: k.nama,
+        divisi: k.divisi,
+        role: k.role || 'Staf SPPG',
+        jenisKelamin: k.jenisKelamin || 'L',
+        status: k.status || 'Aktif'
+      }));
+      if (window.saveActiveRoster) {
+        window.saveActiveRoster(newRoster);
+      }
+
+      // 2. Update pin map lokal
+      if (window.getKaryawanPinMap && window.saveKaryawanPinMap) {
+        const pinMap = window.getKaryawanPinMap() || {};
+        json.data.forEach(k => {
+          const cleanNik = String(k.nik).trim().toUpperCase();
+          if (k.pin) {
+            pinMap[cleanNik] = {
+              pin: String(k.pin).trim(),
+              changed: k.pinChanged || String(k.pin).trim() !== '2026',
+              updatedAt: k.updatedAt || new Date().toISOString()
+            };
+          }
+        });
+        window.saveKaryawanPinMap(pinMap);
+      }
+      console.log(`✓ Sinkronisasi ${json.data.length} karyawan & PIN dari Google Spreadsheet berhasil.`);
+      return json.data;
+    }
+  } catch (e) {
+    console.warn("Sinkronisasi roster dari sheets dilewati (menggunakan data lokal):", e);
+  }
+  return null;
+}
+
 // Global exports
 window.getSheetsWebhookUrl = getSheetsWebhookUrl;
 window.saveSheetsWebhookUrl = saveSheetsWebhookUrl;
@@ -205,6 +284,11 @@ window.fetchAllSubmissions = fetchAllSubmissions;
 window.getLocalRecords = getLocalRecords;
 window.saveLocalRecords = saveLocalRecords;
 window.syncPendingToSheets = syncPendingToSheets;
+window.syncPinUpdateToSheets = syncPinUpdateToSheets;
+window.fetchRosterAndPinsFromSheets = fetchRosterAndPinsFromSheets;
 
 // Auto-sync antrian jika online
-window.addEventListener('online', syncPendingToSheets);
+window.addEventListener('online', () => {
+  syncPendingToSheets();
+  fetchRosterAndPinsFromSheets();
+});

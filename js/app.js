@@ -104,6 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigationTabs();
   loadSavedDataForCurrentDate();
   recalculateScore();
+
+  // Sinkronkan data master karyawan & PIN dari Google Spreadsheet di latar belakang
+  if (typeof window.fetchRosterAndPinsFromSheets === 'function') {
+    window.fetchRosterAndPinsFromSheets().catch(err => console.warn("Background roster sync skipped:", err));
+  }
 });
 
 // 1. Tanggal Controller

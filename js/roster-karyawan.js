@@ -191,6 +191,13 @@ function updateKaryawanPin(nik, oldPin, newPin) {
   };
 
   saveKaryawanPinMap(pinMap);
+
+  // Sinkronkan ke Google Spreadsheet (Sheet: Data_Karyawan) jika tersedia
+  if (typeof window.syncPinUpdateToSheets === 'function') {
+    const k = findKaryawanByNik(cleanNik);
+    window.syncPinUpdateToSheets(cleanNik, cleanNew, k ? k.nama : '', k ? k.divisi : '');
+  }
+
   return { success: true, message: "PIN berhasil diperbarui!" };
 }
 
