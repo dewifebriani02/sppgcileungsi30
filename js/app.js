@@ -816,3 +816,53 @@ window.closeOwnerPinModal = closeOwnerPinModal;
 window.verifyOwnerPin = verifyOwnerPin;
 window.openDzikirModal = openDzikirModal;
 window.closeDzikirModal = closeDzikirModal;
+
+// 13. PWA Installation & Service Worker Controller
+let deferredPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      console.log('✓ SPPG 30 PWA Service Worker siap:', reg.scope);
+    }).catch((err) => {
+      console.warn('PWA Service Worker registration skipped:', err);
+    });
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showPwaInstallBanner();
+});
+
+function showPwaInstallBanner() {
+  if (document.getElementById('pwaInstallBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'pwaInstallBanner';
+  banner.style.cssText = 'position:fixed;bottom:76px;left:50%;transform:translateX(-50%);width:92%;max-width:500px;background:linear-gradient(135deg,#064E3B,#0D9488);color:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.25);z-index:45;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(255,255,255,0.2);';
+  banner.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="icons/icon-192.png" style="width:36px;height:36px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.2)">
+      <div>
+        <div style="font-weight:800;font-size:13px;line-height:1.2">Pasang Aplikasi SPPG 30</div>
+        <div style="font-size:11px;color:#A7F3D0">Akses cepat dari layar utama HP Anda</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button type="button" id="btnTriggerPwaInstall" style="background:#F59E0B;color:#0F172A;border:none;padding:7px 12px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer">Pasang 📲</button>
+      <button type="button" onclick="document.getElementById('pwaInstallBanner').remove()" style="background:none;border:none;color:#fff;font-size:16px;cursor:pointer;padding:4px">✕</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+
+  document.getElementById('btnTriggerPwaInstall')?.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('User response to install prompt:', outcome);
+      deferredPrompt = null;
+      banner.remove();
+    }
+  });
+}
