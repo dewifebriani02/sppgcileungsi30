@@ -115,9 +115,92 @@ function findKaryawanByNik(nik) {
   return null;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// SISTEM PIN PRIBADI KARYAWAN & PROTEKSI PRIVASI (ANTI SALING INTIP)
+// ═══════════════════════════════════════════════════════════════════════════
+const DEFAULT_INITIAL_PIN = "2026";
+
+function getKaryawanPinMap() {
+  try {
+    const raw = localStorage.getItem('sppg_karyawan_pins');
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveKaryawanPinMap(map) {
+  try {
+    localStorage.setItem('sppg_karyawan_pins', JSON.stringify(map));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Verifikasi Login NIK + PIN
+function verifyKaryawanCredentials(nik, inputPin) {
+  const karyawan = findKaryawanByNik(nik);
+  if (!karyawan) {
+    return { success: false, error: "NIK tidak terdaftar dalam roster SPPG." };
+  }
+
+  const cleanNik = karyawan.nik.toUpperCase();
+  const cleanPin = String(inputPin || '').trim();
+  const pinMap = getKaryawanPinMap();
+  const pinEntry = pinMap[cleanNik] || { pin: DEFAULT_INITIAL_PIN, changed: false };
+
+  if (cleanPin !== pinEntry.pin) {
+    return { success: false, error: "PIN yang Anda masukkan salah." };
+  }
+
+  const mustChangePin = (!pinEntry.changed && pinEntry.pin === DEFAULT_INITIAL_PIN);
+
+  return {
+    success: true,
+    mustChangePin: mustChangePin,
+    karyawan: karyawan
+  };
+}
+
+// Ubah PIN Karyawan
+function updateKaryawanPin(nik, oldPin, newPin) {
+  const cleanNik = String(nik).trim().toUpperCase();
+  const cleanOld = String(oldPin || '').trim();
+  const cleanNew = String(newPin || '').trim();
+
+  if (cleanNew.length < 4) {
+    return { success: false, error: "PIN baru minimal 4 karakter/angka." };
+  }
+  if (cleanNew === DEFAULT_INITIAL_PIN) {
+    return { success: false, error: "PIN baru tidak boleh sama dengan PIN awal (2026)." };
+  }
+
+  const pinMap = getKaryawanPinMap();
+  const pinEntry = pinMap[cleanNik] || { pin: DEFAULT_INITIAL_PIN, changed: false };
+
+  // Verifikasi old pin
+  if (cleanOld !== pinEntry.pin && pinEntry.changed) {
+    return { success: false, error: "PIN lama tidak sesuai." };
+  }
+
+  pinMap[cleanNik] = {
+    pin: cleanNew,
+    changed: true,
+    updatedAt: new Date().toISOString()
+  };
+
+  saveKaryawanPinMap(pinMap);
+  return { success: true, message: "PIN berhasil diperbarui!" };
+}
+
 // Global Exports
 window.SPPG_DIVISI_LIST = SPPG_DIVISI_LIST;
 window.DEFAULT_KARYAWAN_ROSTER = DEFAULT_KARYAWAN_ROSTER;
 window.getActiveRoster = getActiveRoster;
 window.saveActiveRoster = saveActiveRoster;
 window.findKaryawanByNik = findKaryawanByNik;
+window.DEFAULT_INITIAL_PIN = DEFAULT_INITIAL_PIN;
+window.verifyKaryawanCredentials = verifyKaryawanCredentials;
+window.updateKaryawanPin = updateKaryawanPin;
+window.getKaryawanPinMap = getKaryawanPinMap;

@@ -46,7 +46,7 @@
 
     <!-- ── 2. USER IDENTITY STRIP ── -->
     <div class="user-identity-strip">
-      <div class="user-meta-info">
+      <div class="user-meta-info" onclick="openProfileModal()" style="cursor:pointer" title="Klik untuk lihat profil & ganti PIN">
         <div class="user-avatar-circle" id="userAvatarInitial">SP</div>
         <div>
           <div class="user-name-text" id="userNameDisplay">Memuat Karyawan...</div>
@@ -56,9 +56,14 @@
           </div>
         </div>
       </div>
-      <button type="button" class="btn-switch-nik" id="btnSwitchNik" onclick="openNikModal(false)">
-        <span>Ganti NIK ↺</span>
-      </button>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button type="button" class="btn-switch-nik" id="btnOpenProfile" onclick="openProfileModal()">
+          <span>🔒 Profil &amp; PIN</span>
+        </button>
+        <button type="button" class="btn-switch-nik" id="btnLogoutKaryawan" onclick="logoutKaryawan()" style="color:#DC2626;border-color:#FECACA" title="Kunci akun saat meninggalkan perangkat">
+          <span>Keluar</span>
+        </button>
+      </div>
     </div>
 
     <!-- ── VIEW 1: FORM INPUT MUTABA'AH HARI INI ── -->
@@ -530,37 +535,133 @@
 
   </div> <!-- End .app-container -->
 
-  <!-- ── MODAL 1: SETUP NIK KARYAWAN ── -->
+  <!-- ── MODAL 1: LOGIN NIK & PIN KARYAWAN ── -->
   <div class="modal-overlay" id="nikSetupModal">
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-title">
-          <span>🏷️ Identitas Karyawan SPPG</span>
+          <span>🔐 Masuk ke Akun Karyawan</span>
         </div>
         <button type="button" class="btn-close-modal" id="btnCloseNikModal" onclick="closeNikModal()">✕</button>
       </div>
-      <p style="font-size:13px;color:#64748B;margin-bottom:16px">
-        Masukkan Nomor Induk Karyawan (NIK) Anda. Sistem akan mengingat identitas di ponsel Anda tanpa perlu login berulang.
+      <p style="font-size:13px;color:#64748B;margin-bottom:14px">
+        Masukkan NIK dan PIN rahasia Anda. Data amal ibadah dan adab Anda terlindungi dan tidak dapat diintip oleh rekan lain.
       </p>
-      <div style="display:grid;gap:14px">
+      
+      <div style="display:grid;gap:13px">
         <div>
           <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">Nomor Induk Karyawan (NIK):</label>
           <input type="text" id="modalNikInput" placeholder="Contoh: SPPG-004 atau 4" class="date-input-styled" style="width:100%;font-size:15px;text-transform:uppercase" autofocus>
-          <div id="modalLookupStatus" style="margin-top:6px;font-size:12px"></div>
+          <div id="modalLookupStatus" style="margin-top:5px;font-size:12px"></div>
         </div>
 
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">Nama Lengkap Karyawan:</label>
-          <input type="text" id="modalNamaInput" placeholder="Nama lengkap Anda..." class="date-input-styled" style="width:100%;font-size:14px">
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">PIN Rahasia Karyawan:</label>
+          <input type="password" id="modalPinInput" maxlength="8" placeholder="Masukkan PIN Anda..." class="date-input-styled" style="width:100%;font-size:16px;letter-spacing:0.2em">
+          <div style="font-size:11px;color:#059669;margin-top:4px;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0">
+            ℹ️ PIN awal karyawan: <strong>2026</strong>. Anda wajib membuat PIN baru pribadi setelah masuk.
+          </div>
+        </div>
+
+        <div id="modalNewEmployeeFields" style="display:none;background:#F8FAFC;padding:10px;border-radius:8px;border:1px solid #E2E8F0;margin-top:4px">
+          <div style="margin-bottom:8px">
+            <label style="display:block;font-size:11.5px;font-weight:700;color:#0F172A;margin-bottom:3px">Nama Lengkap Karyawan Baru:</label>
+            <input type="text" id="modalNamaInput" placeholder="Nama lengkap Anda..." class="date-input-styled" style="width:100%;font-size:13.5px">
+          </div>
+          <div>
+            <label style="display:block;font-size:11.5px;font-weight:700;color:#0F172A;margin-bottom:3px">Divisi SPPG Cileungsi 30:</label>
+            <select id="modalDivisiSelect" class="select-styled" style="font-size:13px"></select>
+          </div>
+        </div>
+
+        <button type="button" id="btnSaveNikModal" class="btn-submit-mutabaah" style="margin-top:6px">
+          <span>Masuk ke Akun Saya 🔑</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL 1B: WAJIB GANTI PIN PERTAMA KALI (FORCE CHANGE PIN) ── -->
+  <div class="modal-overlay" id="forceChangePinModal">
+    <div class="modal-card" style="border-top:4px solid #D97706">
+      <div class="modal-header">
+        <div class="modal-title" style="color:#B45309">
+          <span>🛡️ Buat PIN Pribadi Baru</span>
+        </div>
+      </div>
+      <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px;font-size:12.5px;color:#92400E;margin-bottom:14px;line-height:1.5">
+        <strong>Demi Privasi Amal Ibadah Anda:</strong><br>
+        Anda masih menggunakan PIN standar (2026). Untuk memastikan rekan kerja tidak bisa saling intip atau mengubah catatan ibadah Anda, <strong>wajib membuat PIN pribadi baru</strong> (minimal 4 digit).
+      </div>
+
+      <div style="display:grid;gap:12px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">PIN Baru Anda (Minimal 4 Angka/Karakter):</label>
+          <input type="password" id="inputForceNewPin" maxlength="8" placeholder="••••" class="date-input-styled" style="width:100%;font-size:18px;text-align:center;letter-spacing:0.3em">
         </div>
 
         <div>
-          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">Divisi / Bagian SPPG Cileungsi 30:</label>
-          <select id="modalDivisiSelect" class="select-styled" style="font-size:13.5px"></select>
+          <label style="display:block;font-size:12px;font-weight:700;color:#0F172A;margin-bottom:4px">Konfirmasi PIN Baru:</label>
+          <input type="password" id="inputForceConfirmPin" maxlength="8" placeholder="••••" class="date-input-styled" style="width:100%;font-size:18px;text-align:center;letter-spacing:0.3em">
         </div>
 
-        <button type="button" id="btnSaveNikModal" class="btn-submit-mutabaah" style="margin-top:8px">
-          <span>Mulai Catat Ibadah →</span>
+        <button type="button" id="btnSubmitForcePin" class="btn-submit-mutabaah" style="margin-top:6px;background:linear-gradient(135deg,#064E3B,#0D9488)">
+          <span>Simpan PIN Baru &amp; Mulai Catat ✓</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL 1C: PROFIL KARYAWAN & EDIT PASSWORD / PIN ── -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>👤 Profil &amp; Keamanan Akun</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeProfileModal()">✕</button>
+      </div>
+
+      <!-- Info Card -->
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+        <div class="user-avatar-circle" id="profileAvatarInitial" style="width:48px;height:48px;font-size:18px">SP</div>
+        <div>
+          <div id="profileFullName" style="font-weight:800;font-size:15px;color:#0F172A">-</div>
+          <div id="profileDivisiRole" style="font-size:12px;color:#64748B">-</div>
+          <div style="font-size:11px;color:#0D9488;font-weight:700;margin-top:2px">NIK: <span id="profileNik">-</span></div>
+        </div>
+      </div>
+
+      <!-- Form Ganti PIN -->
+      <div style="border-top:1px solid #E2E8F0;padding-top:14px">
+        <h3 style="font-size:14px;font-weight:800;color:#064E3B;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          <span>🔑 Ganti PIN / Password Pribadi</span>
+        </h3>
+
+        <div style="display:grid;gap:10px">
+          <div>
+            <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:3px">PIN Lama Saat Ini:</label>
+            <input type="password" id="inputProfileOldPin" maxlength="8" placeholder="PIN lama..." class="date-input-styled" style="width:100%">
+          </div>
+          <div>
+            <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:3px">PIN Baru (Minimal 4 Digit):</label>
+            <input type="password" id="inputProfileNewPin" maxlength="8" placeholder="PIN baru..." class="date-input-styled" style="width:100%">
+          </div>
+          <div>
+            <label style="display:block;font-size:11.5px;font-weight:700;color:#475569;margin-bottom:3px">Konfirmasi PIN Baru:</label>
+            <input type="password" id="inputProfileConfirmPin" maxlength="8" placeholder="Ulangi PIN baru..." class="date-input-styled" style="width:100%">
+          </div>
+
+          <button type="button" onclick="submitProfilePinChange()" class="btn-submit-mutabaah" style="padding:10px 16px;font-size:13px;margin-top:4px">
+            <span>Simpan Perubahan PIN ✓</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid #E2E8F0;margin-top:18px;padding-top:14px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11.5px;color:#64748B">Selesai mengisi di ponsel bersama?</span>
+        <button type="button" onclick="logoutKaryawan()" style="background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+          🔒 Kunci &amp; Keluar
         </button>
       </div>
     </div>

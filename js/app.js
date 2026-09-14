@@ -130,19 +130,23 @@ function initDateInput() {
   }
 }
 
-// 2. Identitas Karyawan Controller
+// 2. Identitas Karyawan Controller (Dengan Sistem PIN Pribadi & Anti Saling Intip)
 function initIdentity() {
-  if (!currentKaryawan.nik) {
+  const isAuthSession = sessionStorage.getItem('sppg_karyawan_session') === 'true';
+
+  if (!currentKaryawan.nik || !isAuthSession) {
     openNikModal(true);
   } else {
     updateIdentityHeaderUI();
   }
 
-  // Setup Event Modal NIK
+  // Setup Event Modal Login
   const nikInput = document.getElementById('modalNikInput');
+  const pinInput = document.getElementById('modalPinInput');
   const namaInput = document.getElementById('modalNamaInput');
   const divisiSelect = document.getElementById('modalDivisiSelect');
   const lookupStatus = document.getElementById('modalLookupStatus');
+  const newFieldsBox = document.getElementById('modalNewEmployeeFields');
   const btnSaveNik = document.getElementById('btnSaveNikModal');
 
   // Populate Divisi Options
@@ -155,77 +159,222 @@ function initIdentity() {
       const val = e.target.value.trim();
       if (!val) {
         if (lookupStatus) lookupStatus.innerHTML = '';
+        if (newFieldsBox) newFieldsBox.style.display = 'none';
         return;
       }
       const match = window.findKaryawanByNik(val);
       if (match) {
+        if (newFieldsBox) newFieldsBox.style.display = 'none';
         if (namaInput) namaInput.value = match.nama;
         if (divisiSelect) divisiSelect.value = match.divisi;
         if (lookupStatus) {
-          lookupStatus.innerHTML = `<span style="color:#059669;font-weight:700">✓ Karyawan Terdaftar: ${match.nama} (${match.role || match.divisi})</span>`;
+          lookupStatus.innerHTML = `<span style="color:#059669;font-weight:700">✓ ${match.nama} (${match.divisi})</span>`;
         }
       } else {
+        if (newFieldsBox) newFieldsBox.style.display = 'block';
         if (lookupStatus) {
-          lookupStatus.innerHTML = `<span style="color:#D97706;font-size:12px">Karyawan baru? Silakan lengkapi nama & divisi di bawah:</span>`;
+          lookupStatus.innerHTML = `<span style="color:#D97706;font-size:12px">Karyawan baru? Lengkapi nama & divisi di bawah:</span>`;
         }
       }
     });
   }
 
   if (btnSaveNik) {
-    btnSaveNik.addEventListener('click', () => {
-      const nikVal = (nikInput.value || '').trim().toUpperCase();
-      const namaVal = (namaInput.value || '').trim();
-      const divisiVal = (divisiSelect.value || '').trim();
-
-      if (!nikVal) {
-        alert("Silakan masukkan NIK Anda.");
-        return;
-      }
-      if (!namaVal) {
-        alert("Silakan masukkan Nama Lengkap Anda.");
-        return;
-      }
-
-      currentKaryawan = {
-        nik: nikVal,
-        nama: namaVal,
-        divisi: divisiVal
-      };
-
-      localStorage.setItem('sppg_karyawan_nik', currentKaryawan.nik);
-      localStorage.setItem('sppg_karyawan_nama', currentKaryawan.nama);
-      localStorage.setItem('sppg_karyawan_divisi', currentKaryawan.divisi);
-
-      // Jika belum ada di master roster, tambahkan secara dinamis
-      const existing = window.findKaryawanByNik(nikVal);
-      if (!existing) {
-        const roster = window.getActiveRoster();
-        roster.push({
-          nik: currentKaryawan.nik,
-          nama: currentKaryawan.nama,
-          divisi: currentKaryawan.divisi,
-          role: "Staf SPPG",
-          status: "Aktif"
-        });
-        window.saveActiveRoster(roster);
-      }
-
-      updateIdentityHeaderUI();
-      closeNikModal();
-      loadSavedDataForCurrentDate();
-      recalculateScore();
-      showToast(`Ahlan wa Sahlan, ${currentKaryawan.nama}!`);
-    });
+    btnSaveNik.addEventListener('click', handleKaryawanLogin);
   }
 
-  // Tombol Ganti NIK di Header
-  const btnSwitch = document.getElementById('btnSwitchNik');
-  if (btnSwitch) {
-    btnSwitch.addEventListener('click', () => {
-      openNikModal(false);
-    });
+  // Setup Force Change PIN Submission
+  const btnSubmitForce = document.getElementById('btnSubmitForcePin');
+  if (btnSubmitForce) {
+    btnSubmitForce.addEventListener('click', handleForcePinChange);
   }
+}
+
+function handleKaryawanLogin() {
+  const nikInput = document.getElementById('modalNikInput');
+  const pinInput = document.getElementById('modalPinInput');
+  const namaInput = document.getElementById('modalNamaInput');
+  const divisiSelect = document.getElementById('modalDivisiSelect');
+
+  const nikVal = (nikInput ? nikInput.value : '').trim().toUpperCase();
+  const pinVal = (pinInput ? pinInput.value : '').trim();
+
+  if (!nikVal) {
+    alert("Silakan masukkan NIK Anda.");
+    return;
+  }
+  if (!pinVal) {
+    alert("Silakan masukkan PIN Anda. (PIN awal standar: 2026)");
+    return;
+  }
+
+  let match = window.findKaryawanByNik(nikVal);
+
+  // Jika karyawan baru mendaftar
+  if (!match) {
+    const namaVal = (namaInput ? namaInput.value : '').trim();
+    const divisiVal = (divisiSelect ? divisiSelect.value : '').trim();
+    if (!namaVal) {
+      alert("Nama lengkap wajib diisi untuk pendaftaran NIK baru.");
+      return;
+    }
+    const roster = window.getActiveRoster();
+    match = {
+      nik: nikVal,
+      nama: namaVal,
+      divisi: divisiVal || "SPPG Cileungsi 30",
+      role: "Staf SPPG",
+      status: "Aktif"
+    };
+    roster.push(match);
+    window.saveActiveRoster(roster);
+  }
+
+  // Verifikasi Kredensial NIK & PIN
+  const credCheck = window.verifyKaryawanCredentials(nikVal, pinVal);
+  if (!credCheck.success) {
+    alert("PIN yang Anda masukkan salah. Silakan coba kembali (PIN awal: 2026).");
+    if (pinInput) {
+      pinInput.value = '';
+      pinInput.focus();
+    }
+    return;
+  }
+
+  // Simpan data karyawan saat ini
+  currentKaryawan = {
+    nik: match.nik,
+    nama: match.nama,
+    divisi: match.divisi
+  };
+
+  localStorage.setItem('sppg_karyawan_nik', currentKaryawan.nik);
+  localStorage.setItem('sppg_karyawan_nama', currentKaryawan.nama);
+  localStorage.setItem('sppg_karyawan_divisi', currentKaryawan.divisi);
+
+  // Cek apakah wajib ganti PIN pertama kali
+  if (credCheck.mustChangePin) {
+    closeNikModal();
+    openForceChangePinModal();
+  } else {
+    sessionStorage.setItem('sppg_karyawan_session', 'true');
+    updateIdentityHeaderUI();
+    closeNikModal();
+    loadSavedDataForCurrentDate();
+    recalculateScore();
+    showToast(`Ahlan wa Sahlan, ${currentKaryawan.nama}!`);
+  }
+}
+
+function openForceChangePinModal() {
+  const modal = document.getElementById('forceChangePinModal');
+  const p1 = document.getElementById('inputForceNewPin');
+  const p2 = document.getElementById('inputForceConfirmPin');
+  if (p1) p1.value = '';
+  if (p2) p2.value = '';
+  if (modal) modal.classList.add('active');
+}
+
+function handleForcePinChange() {
+  const p1 = (document.getElementById('inputForceNewPin')?.value || '').trim();
+  const p2 = (document.getElementById('inputForceConfirmPin')?.value || '').trim();
+
+  if (!p1 || p1.length < 4) {
+    alert("PIN baru minimal 4 angka/karakter.");
+    return;
+  }
+  if (p1 === '2026') {
+    alert("PIN baru tidak boleh sama dengan PIN awal (2026). Silakan buat PIN pribadi rahasia Anda.");
+    return;
+  }
+  if (p1 !== p2) {
+    alert("Konfirmasi PIN baru tidak cocok. Pastikan kedua kolom sama persis.");
+    return;
+  }
+
+  const res = window.updateKaryawanPin(currentKaryawan.nik, '2026', p1);
+  if (res.success) {
+    sessionStorage.setItem('sppg_karyawan_session', 'true');
+    const modal = document.getElementById('forceChangePinModal');
+    if (modal) modal.classList.remove('active');
+
+    updateIdentityHeaderUI();
+    loadSavedDataForCurrentDate();
+    recalculateScore();
+    showToast(`✓ PIN Pribadi Berhasil Dibuat! Data Anda Aman.`);
+  } else {
+    alert(res.error || "Gagal memperbarui PIN.");
+  }
+}
+
+// Profil Karyawan & Ganti PIN
+function openProfileModal() {
+  if (!currentKaryawan.nik) {
+    openNikModal(true);
+    return;
+  }
+
+  const modal = document.getElementById('profileModal');
+  const nameEl = document.getElementById('profileFullName');
+  const divisiEl = document.getElementById('profileDivisiRole');
+  const nikEl = document.getElementById('profileNik');
+  const avatarEl = document.getElementById('profileAvatarInitial');
+
+  if (nameEl) nameEl.textContent = currentKaryawan.nama || '-';
+  if (divisiEl) divisiEl.textContent = currentKaryawan.divisi || '-';
+  if (nikEl) nikEl.textContent = currentKaryawan.nik || '-';
+  if (avatarEl && currentKaryawan.nama) {
+    avatarEl.textContent = currentKaryawan.nama.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  // Reset input ganti pin
+  const oldPin = document.getElementById('inputProfileOldPin');
+  const newPin = document.getElementById('inputProfileNewPin');
+  const confirmPin = document.getElementById('inputProfileConfirmPin');
+  if (oldPin) oldPin.value = '';
+  if (newPin) newPin.value = '';
+  if (confirmPin) confirmPin.value = '';
+
+  if (modal) modal.classList.add('active');
+}
+
+function closeProfileModal() {
+  const modal = document.getElementById('profileModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function submitProfilePinChange() {
+  const oldPin = (document.getElementById('inputProfileOldPin')?.value || '').trim();
+  const newPin = (document.getElementById('inputProfileNewPin')?.value || '').trim();
+  const confirmPin = (document.getElementById('inputProfileConfirmPin')?.value || '').trim();
+
+  if (!oldPin) {
+    alert("Silakan masukkan PIN lama Anda.");
+    return;
+  }
+  if (!newPin || newPin.length < 4) {
+    alert("PIN baru minimal 4 angka/karakter.");
+    return;
+  }
+  if (newPin !== confirmPin) {
+    alert("Konfirmasi PIN baru tidak sesuai.");
+    return;
+  }
+
+  const res = window.updateKaryawanPin(currentKaryawan.nik, oldPin, newPin);
+  if (res.success) {
+    alert("✓ PIN berhasil diperbarui! Silakan ingat PIN baru Anda.");
+    closeProfileModal();
+  } else {
+    alert(res.error || "Gagal mengubah PIN.");
+  }
+}
+
+function logoutKaryawan() {
+  sessionStorage.removeItem('sppg_karyawan_session');
+  closeProfileModal();
+  openNikModal(true);
+  showToast("Akun dikunci. Silakan masukkan PIN untuk membuka kembali.");
 }
 
 function updateIdentityHeaderUI() {
@@ -250,19 +399,24 @@ function openNikModal(isFirstTime = false) {
   if (closeBtn) closeBtn.style.display = isFirstTime ? 'none' : 'flex';
 
   const nikInput = document.getElementById('modalNikInput');
-  const namaInput = document.getElementById('modalNamaInput');
-  const divisiSelect = document.getElementById('modalDivisiSelect');
+  const pinInput = document.getElementById('modalPinInput');
   const lookupStatus = document.getElementById('modalLookupStatus');
+  const newFieldsBox = document.getElementById('modalNewEmployeeFields');
 
   if (nikInput) nikInput.value = currentKaryawan.nik || '';
-  if (namaInput) namaInput.value = currentKaryawan.nama || '';
-  if (divisiSelect && currentKaryawan.divisi) divisiSelect.value = currentKaryawan.divisi;
+  if (pinInput) pinInput.value = '';
   if (lookupStatus) lookupStatus.innerHTML = '';
+  if (newFieldsBox) newFieldsBox.style.display = 'none';
 
   if (modal) modal.classList.add('active');
 }
 
 function closeNikModal() {
+  const isAuthSession = sessionStorage.getItem('sppg_karyawan_session') === 'true';
+  if (!isAuthSession && !currentKaryawan.nik) {
+    alert("Silakan masukkan NIK dan PIN Anda terlebih dahulu untuk mengakses mutaba'ah.");
+    return;
+  }
   const modal = document.getElementById('nikSetupModal');
   if (modal) modal.classList.remove('active');
 }
